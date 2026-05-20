@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import { getItemInfo } from '../../game/items';
+import { getEquipmentInfo, getRarityColor } from '../../game/equipment/equipmentManager';
 
 export default function InventoryDisplay({ inventory, onUseItem }) {
   const [clickedSlot, setClickedSlot] = useState(null);
@@ -22,7 +23,11 @@ export default function InventoryDisplay({ inventory, onUseItem }) {
         )}
         {inventory.map((slot, i) => {
           const info = slot ? getItemInfo(slot.itemKey) : null;
+          const eqInfo = slot ? getEquipmentInfo(slot.itemKey) : null;
           const isClicked = clickedSlot === i;
+          const displayName = info?.name || eqInfo?.name || '(空)';
+          const isEquipment = !!eqInfo;
+          const rarityColor = isEquipment ? getRarityColor(eqInfo.rarity) : 'text-yellow-300';
 
           return (
             <div
@@ -31,14 +36,14 @@ export default function InventoryDisplay({ inventory, onUseItem }) {
               className={`
                 px-2 py-1.5 text-xs border-b border-gray-700 last:border-b-0
                 flex justify-between items-center
-                ${info
-                  ? 'text-yellow-300 cursor-pointer hover:bg-gray-600 active:bg-gray-500 transition-colors'
+                ${info || eqInfo
+                  ? 'cursor-pointer hover:bg-gray-600 active:bg-gray-500 transition-colors'
                   : 'text-gray-600 cursor-default'}
                 ${isClicked ? 'bg-yellow-800' : ''}
               `}
             >
               <span className="text-gray-500">[{i + 1}]</span>
-              <span>{info ? info.name : '(空)'}</span>
+              <span className={info || eqInfo ? rarityColor : ''}>{displayName}</span>
               <span className="text-gray-500 text-xs">
                 {slot.quantity > 1 ? `x${slot.quantity}` : ''}
               </span>

@@ -36,9 +36,48 @@ export function equipItem(state, itemKey) {
     player.mp += bonus.maxMp;
   }
 
-  player.equipment[slot] = { itemKey, name: eq.name, slot };
+  player.equipment[slot] = { itemKey, name: eq.name, slot, rarity: eq.rarity || 'common' };
 
   return { success: true, message: `装备了${eq.name}` };
+}
+
+/**
+ * 获取品质对应的 Tailwind 颜色类
+ */
+export function getRarityColor(rarity) {
+  switch (rarity) {
+    case 'epic':   return 'text-yellow-400';
+    case 'rare':   return 'text-blue-400';
+    default:       return 'text-gray-400';
+  }
+}
+
+/**
+ * 获取品质中文标签
+ */
+export function getRarityLabel(rarity) {
+  switch (rarity) {
+    case 'epic':   return '史诗';
+    case 'rare':   return '稀有';
+    default:       return '普通';
+  }
+}
+
+/**
+ * 格式化装备属性加成为可读文本
+ */
+export function getBonusText(bonus) {
+  const parts = [];
+  if (bonus.attackMin) parts.push(`+${bonus.attackMin}最小攻击`);
+  if (bonus.attackMax) parts.push(`+${bonus.attackMax}最大攻击`);
+  if (bonus.strength) parts.push(`+${bonus.strength}力量`);
+  if (bonus.defense !== undefined) {
+    parts.push(bonus.defense >= 0 ? `+${bonus.defense}防御` : `${bonus.defense}防御`);
+  }
+  if (bonus.agility) parts.push(`+${bonus.agility}敏捷`);
+  if (bonus.maxHp) parts.push(`+${bonus.maxHp}HP`);
+  if (bonus.maxMp) parts.push(`+${bonus.maxMp}MP`);
+  return parts.join(' / ');
 }
 
 /**

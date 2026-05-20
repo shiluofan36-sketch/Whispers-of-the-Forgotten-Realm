@@ -9,6 +9,7 @@ import { onMonsterKilled } from '../dungeon/floorProgression';
 import { unlockNextFloor } from '../expedition/expeditionManager';
 import { getBossEquipment, getRandomEquipment, getEquipmentInfo } from '../equipment/equipmentManager';
 import { checkAchievements } from '../achievements/achievementManager';
+import { tryTriggerEvent } from '../events/randomEvents';
 
 /**
  * 战斗胜利后：EXP + 金币 + 掉落 + HP/MP恢复 + 怪物刷新 or 胜利判定
@@ -63,6 +64,11 @@ export function grantBattleRewards(state) {
         state.battleLog.push(`${monster.name}掉落了${eqInfo.name}！`);
       }
     }
+  }
+
+  // 随机事件（仅普通怪物击杀）
+  if (!monster.bossKey) {
+    tryTriggerEvent(state);
   }
 
   // EXP

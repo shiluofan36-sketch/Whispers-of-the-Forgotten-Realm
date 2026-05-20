@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { getEquipmentInfo } from '../../game/equipment/equipmentManager';
+import { getEquipmentInfo, getRarityColor, getRarityLabel, getBonusText } from '../../game/equipment/equipmentManager';
 
 export default function EquipmentPanel({ state, onCampAction, onBack }) {
   const [message, setMessage] = useState(null);
@@ -48,20 +48,36 @@ export default function EquipmentPanel({ state, onCampAction, onBack }) {
             const eq = equipment[slot];
             const info = eq ? getEquipmentInfo(eq.itemKey) : null;
             return (
-              <div key={slot} className="bg-gray-800 rounded p-2 border border-gray-700 flex justify-between items-center">
-                <div>
-                  <span className="text-gray-400 text-xs">[{label}]</span>
-                  <span className={`ml-2 text-xs ${eq ? 'text-yellow-300' : 'text-gray-600'}`}>
-                    {eq ? eq.name : '(空)'}
-                  </span>
+              <div key={slot} className="bg-gray-800 rounded p-2 border border-gray-700">
+                <div className="flex justify-between items-center">
+                  <div>
+                    <span className="text-gray-400 text-xs">[{label}]</span>
+                    {eq ? (
+                      <>
+                        <span className={`ml-2 text-xs font-bold ${getRarityColor(info?.rarity)}`}>
+                          {eq.name}
+                        </span>
+                        <span className={`ml-1 text-xs ${getRarityColor(info?.rarity)}`}>
+                          [{getRarityLabel(info?.rarity)}]
+                        </span>
+                      </>
+                    ) : (
+                      <span className="ml-2 text-xs text-gray-600">(空)</span>
+                    )}
+                  </div>
+                  {eq && (
+                    <button
+                      onClick={() => handleUnequip(slot)}
+                      className="px-2 py-0.5 rounded text-xs text-white bg-red-700 hover:bg-red-600"
+                    >
+                      卸下
+                    </button>
+                  )}
                 </div>
-                {eq && (
-                  <button
-                    onClick={() => handleUnequip(slot)}
-                    className="px-2 py-0.5 rounded text-xs text-white bg-red-700 hover:bg-red-600"
-                  >
-                    卸下
-                  </button>
+                {eq && info && (
+                  <div className="text-xs text-gray-500 mt-0.5 ml-7">
+                    {getBonusText(info.bonus)}
+                  </div>
                 )}
               </div>
             );
@@ -82,15 +98,25 @@ export default function EquipmentPanel({ state, onCampAction, onBack }) {
             return (
               <div
                 key={realIndex}
-                className="px-2 py-1 text-xs border-b border-gray-700 last:border-b-0 flex justify-between items-center"
+                className="px-2 py-1 text-xs border-b border-gray-700 last:border-b-0"
               >
-                <span className="text-yellow-300">{info?.name}</span>
-                <button
-                  onClick={() => handleEquip(realIndex)}
-                  className="px-2 py-0.5 rounded text-xs text-white bg-green-700 hover:bg-green-600"
-                >
-                  装备
-                </button>
+                <div className="flex justify-between items-center">
+                  <span className={`font-bold ${getRarityColor(info?.rarity)}`}>
+                    {info?.name}
+                    <span className="ml-1 opacity-70">[{getRarityLabel(info?.rarity)}]</span>
+                  </span>
+                  <button
+                    onClick={() => handleEquip(realIndex)}
+                    className="px-2 py-0.5 rounded text-xs text-white bg-green-700 hover:bg-green-600"
+                  >
+                    装备
+                  </button>
+                </div>
+                {info && (
+                  <div className="text-xs text-gray-500 mt-0.5">
+                    {getBonusText(info.bonus)}
+                  </div>
+                )}
               </div>
             );
           })}

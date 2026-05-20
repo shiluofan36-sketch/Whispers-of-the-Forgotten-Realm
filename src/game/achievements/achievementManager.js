@@ -30,6 +30,15 @@ export function checkAchievements(state, event) {
       case 'NECRO_HUNTER':
         unlocked = event.type === 'boss_kill' && event.bossKey === 'NECROMANCER';
         break;
+      case 'SHADOW_SLAYER':
+        unlocked = event.type === 'boss_kill' && event.bossKey === 'SHADOW_LORD';
+        break;
+      case 'FIRE_SLAYER':
+        unlocked = event.type === 'boss_kill' && event.bossKey === 'FIRE_ELEMENTAL';
+        break;
+      case 'DUNGEON_CONQUEROR':
+        unlocked = event.type === 'floor_unlock' && state.unlockedFloors >= 12;
+        break;
       case 'GOLD_HOARDER':
         unlocked = event.type === 'gold_gain' && state.player.gold >= 500;
         break;
