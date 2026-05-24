@@ -23,13 +23,22 @@ export function canStackTo(itemKey, currentQty) {
  * 向 inventory 数组添加物品：先找同类且未满的格子堆叠，再开新格子
  * @returns {{ success: boolean, stacked: boolean }}
  */
-export function tryAddItem(inventory, capacity, itemKey, count = 1) {
+export function tryAddItem(inventory, capacity, itemKey, count = 1, generatedData = null) {
   const maxStack = getMaxStack(itemKey);
   let remaining = count;
 
-  // 先尝试堆叠到已有同类
+  // Equipment with affixes: never stack, always use new slot
+  if (generatedData) {
+    if (inventory.length >= capacity) {
+      return { success: false, stacked: false };
+    }
+    inventory.push({ itemKey, quantity: 1, generated: generatedData });
+    return { success: true, stacked: false };
+  }
+
+  // 先尝试堆叠到已有同类 (only for non-generated items)
   for (const slot of inventory) {
-    if (slot.itemKey === itemKey && slot.quantity < maxStack) {
+    if (!slot.generated && slot.itemKey === itemKey && slot.quantity < maxStack) {
       const space = maxStack - slot.quantity;
       const add = Math.min(space, remaining);
       slot.quantity += add;

@@ -25,5 +25,7 @@ export function createBoss(playerPos, obstacles, bossKey) {
     attackRate: 0.5,  // Boss走独立AI，此字段未使用
     exp: config.exp,
     enraged: false,
+    flashTimer: 0,
+    statusEffects: [],
   };
 }

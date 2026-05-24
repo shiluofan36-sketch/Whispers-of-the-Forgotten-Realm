@@ -1,0 +1,72 @@
+// Boss类型（唯一配置源：shared/config/bosses.js）
+export const BOSS_TYPES = {
+  ANCIENT_DRAGON: {
+    bossKey: 'ANCIENT_DRAGON',
+    name: '远古巨龙',
+    hp: 300, maxHp: 300,
+    attackMin: 15, attackMax: 30,
+    color: '#ff2200', exp: 200,
+    skills: [
+      { type: 'damage', name: '火焰吐息', damage: 40, rate: 0.30 },
+      { type: 'defend', name: '龙鳞防御', rate: 0.25 },
+    ],
+    enrageThreshold: 0.5, enrageAtkBonus: 10,
+  },
+  DEMON_LORD: {
+    bossKey: 'DEMON_LORD',
+    name: '恶魔领主',
+    hp: 400, maxHp: 400,
+    attackMin: 20, attackMax: 35,
+    color: '#8b00ff', exp: 350,
+    skills: [
+      { type: 'damage', name: '暗影箭', damage: 50, rate: 0.25 },
+      { type: 'heal', name: '生命吸取', healAmount: 40, rate: 0.20 },
+    ],
+    enrageThreshold: 0.3, enrageAtkBonus: 15,
+  },
+  SHADOW_LORD: {
+    bossKey: 'SHADOW_LORD',
+    name: '暗影领主',
+    hp: 500, maxHp: 500,
+    attackMin: 25, attackMax: 40,
+    color: '#6600cc', exp: 500,
+    skills: [
+      { type: 'damage', name: '暗影风暴', damage: 55, rate: 0.30, status: 'freeze', statusDuration: 2 },
+      { type: 'heal', name: '暗影汲取', healAmount: 50, rate: 0.20 },
+      { type: 'defend', name: '暗影帷幕', rate: 0.20 },
+    ],
+    enrageThreshold: 0.35, enrageAtkBonus: 18,
+    behavior: 'caster',
+  },
+  FIRE_ELEMENTAL: {
+    bossKey: 'FIRE_ELEMENTAL',
+    name: '火焰元素',
+    hp: 600, maxHp: 600,
+    attackMin: 30, attackMax: 50,
+    color: '#ff6600', exp: 600,
+    skills: [
+      { type: 'damage', name: '烈焰风暴', damage: 60, rate: 0.35, status: 'burn', statusDuration: 3 },
+      { type: 'damage', name: '熔岩喷发', damage: 45, rate: 0.25, status: 'burn', statusDuration: 2 },
+      { type: 'defend', name: '火焰护盾', rate: 0.20 },
+    ],
+    enrageThreshold: 0.30, enrageAtkBonus: 22,
+    behavior: 'phase',
+    phaseBonus: { skillRate: 0.10, atkBonus: 8 },
+  },
+  NECROMANCER: {
+    bossKey: 'NECROMANCER',
+    name: '亡灵法师',
+    hp: 250, maxHp: 250,
+    attackMin: 25, attackMax: 40,
+    color: '#44cc44', exp: 400,
+    skills: [
+      { type: 'damage', name: '死亡凋零', damage: 35, rate: 0.35 },
+      { type: 'defend', name: '骨盾', rate: 0.30 },
+    ],
+    enrageThreshold: 0.4, enrageAtkBonus: 20,
+    behavior: 'summoner',
+    summonType: 'SKELETON',
+    summonMax: 2,
+    summonInterval: 3,
+  },
+};

@@ -6,12 +6,40 @@ import {
 } from './constants';
 import { loadGame } from './save/saveManager';
 import { applySaveData } from './save/saveSchema';
+import { on } from './eventBus/gameEvents';
+import { checkAchievements } from './achievements/achievementManager';
+import { setWorldFlag } from './world/worldFlags';
+
+// 注册全局事件监听（仅执行一次）
+let listenersRegistered = false;
+function registerEventListeners() {
+  if (listenersRegistered) return;
+  listenersRegistered = true;
+
+  on('monster_killed', (state) => {
+    checkAchievements(state, { type: 'monster_kill' });
+  });
+
+  on('boss_killed', (state, { bossKey }) => {
+    checkAchievements(state, { type: 'boss_kill', bossKey });
+    const flagMap = {
+      ANCIENT_DRAGON: 'dragonSlain',
+      DEMON_LORD: 'demonSlain',
+      SHADOW_LORD: 'shadowSlain',
+      FIRE_ELEMENTAL: 'fireElementalSlain',
+      NECROMANCER: 'necromancerSlain',
+    };
+    if (flagMap[bossKey]) setWorldFlag(state, flagMap[bossKey]);
+  });
+}
 
 /**
  * 创建初始游戏状态
  * 优先从 localStorage 加载存档，无存档时创建新游戏
  */
 export function createInitialState() {
+  registerEventListeners();
+
   // 基础状态（新游戏默认值）
   const state = {
     // 玩家数据
@@ -33,6 +61,16 @@ export function createInitialState() {
       mp: PLAYER_MP,
       maxMp: PLAYER_MP,
       shieldTurns: 0,
+      // Phase 12: 装备词缀bonus属性
+      critRateBonus: 0,
+      critDamageBonus: 0,
+      lifesteal: 0,
+      poisonChance: 0,
+      burnChance: 0,
+      freezeChance: 0,
+      dodgeRate: 0,
+      thorns: 0,
+      healPower: 0,
       gold: 0,                         // Phase 7: 永久金币
       equipment: {                     // Phase 8: 装备槽位
         weapon: null,
@@ -97,6 +135,56 @@ export function createInitialState() {
 
     // Phase 8: 已解锁成就列表
     unlockedAchievements: [],
+
+    // Phase 10: 战斗反馈
+    floatingTexts: [],
+    screenShake: { intensity: 0, duration: 0, timer: 0 },
+
+    // Phase 10: 状态异常（玩家）
+    statusEffects: [],
+
+    // Phase 12: 技能冷却
+    skillCooldowns: {},
+
+    // Phase 10: Boss召唤小兵
+    bossMinions: [],
+
+    // Phase 11: 特殊房间（当前楼层）
+    room: null,
+
+    // Phase 11: 待处理的选择型事件
+    pendingEvent: null,
+
+    // Phase 11: 营地NPC列表（固定4人）
+    npcs: ['blacksmith', 'merchant', 'hunter', 'scholar'],
+
+    // Phase 11: 世界观碎片历史
+    loreHistory: [],
+
+    // Phase 11: 世界状态记忆（长期flag）
+    worldFlags: {},
+
+    // Phase 11: 营地Meta升级（持久化在player上）
+    metaProgress: {
+      storage: 0,
+      blacksmith: 0,
+      potionShop: 0,
+      adventurerHall: 0,
+    },
+
+    // Phase 12: 难度等级
+    ascensionLevel: 0,
+
+    // Phase 12: 当前遗物（远征内有效）
+    currentRelic: null,
+
+    // Phase 13: 动画系统
+    animation: {
+      idlePhase: 0,
+      hitStopTimer: 0,
+      skillEffects: [],
+      lootCard: null,
+    },
   };
 
   // 尝试加载存档

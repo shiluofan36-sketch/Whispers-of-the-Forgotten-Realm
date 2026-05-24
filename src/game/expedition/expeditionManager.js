@@ -6,6 +6,8 @@ import { GAME_PHASE, TOTAL_FLOORS } from '../constants';
 import { generateFloor } from '../dungeon/floorGenerator';
 import { saveGame, autoSave } from '../save/saveManager';
 import { checkAchievements } from '../achievements/achievementManager';
+import { applyMetaBonuses, revertMetaBonuses } from '../meta/metaManager';
+import { pickRandomRelic, applyRelic, removeRelic } from '../relics/relicManager';
 
 /**
  * 开始一次远征：生成选定楼层，切换进入探索模式
@@ -15,11 +17,17 @@ export function startExpedition(state, floor) {
 
   state.selectedFloor = floor;
   state.expeditionGold = 0;
-  state.inventory = [];
   state.battleLog = [];
 
   generateFloor(state, floor);
   state.gamePhase = GAME_PHASE.EXPLORATION;
+
+  // Phase 11: 应用 Meta 加成
+  applyMetaBonuses(state);
+
+  // Phase 12: 随机遗物
+  const relic = pickRandomRelic();
+  applyRelic(state, relic);
 
   state.battleLog.push(`远征开始！进入 Floor ${floor}`);
   return true;
@@ -53,6 +61,9 @@ export function returnToCamp(state) {
   state.gamePhase = GAME_PHASE.CAMP;
   state.selectedFloor = null;
 
+  revertMetaBonuses(state);
+  removeRelic(state);
+
   checkAchievements(state, { type: 'return_camp', expeditionGold: goldEarned });
   autoSave(state, 'return_camp');
 }
@@ -85,6 +96,9 @@ export function handleDeath(state) {
 
   state.gamePhase = GAME_PHASE.CAMP;
   state.selectedFloor = null;
+
+  revertMetaBonuses(state);
+  removeRelic(state);
 
   autoSave(state, 'return_camp');
 }

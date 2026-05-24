@@ -6,6 +6,20 @@ import MpBar from '../shared/MpBar';
 import InventoryDisplay from '../shared/InventoryDisplay';
 import FloorClearedBanner from '../shared/FloorClearedBanner';
 
+function logColor(msg) {
+  if (msg.includes('CRIT')) return 'text-yellow-300 font-bold';
+  if (msg.includes('闪避')) return 'text-green-300';
+  if (msg.includes('恢复') || msg.includes('疗')) return 'text-green-400';
+  if (msg.includes('获得') || msg.includes('掉落')) return 'text-yellow-400';
+  if (msg.includes('随机事件') || msg.includes('[')) return 'text-purple-400';
+  if (msg.includes('灼烧') || msg.includes('中毒') || msg.includes('冻结')) return 'text-orange-400';
+  if (msg.includes('狂暴')) return 'text-red-400 font-bold';
+  if (msg.includes('升级') || msg.includes('LV')) return 'text-yellow-300';
+  if (msg.includes('成就')) return 'text-cyan-400';
+  if (msg.includes('伤害') || msg.includes('造成')) return 'text-gray-400';
+  return 'text-gray-500';
+}
+
 export default function ExplorationPanel({ state, onUseItem, onCampAction }) {
   const { player, monster, turn, monstersDefeated, inventory, battleLog,
           currentFloor, floorName, isBossFloor, enemiesRemaining, stairsLocked,
@@ -33,6 +47,39 @@ export default function ExplorationPanel({ state, onUseItem, onCampAction }) {
           </>
         )}
       </div>
+
+      {/* Phase 12: 遗物 */}
+      {state.currentRelic && (
+        <div className="bg-purple-900/50 rounded p-2 border border-purple-700 text-center">
+          <div className="text-purple-300 text-xs">遗物</div>
+          <div className="text-purple-200 font-bold text-xs">{state.currentRelic.name}</div>
+          <div className="text-gray-500 text-xs">{state.currentRelic.desc}</div>
+        </div>
+      )}
+
+      {/* Phase 11: 选择型事件提示 */}
+      {state.pendingEvent && (
+        <div className="bg-yellow-900 border-2 border-yellow-500 rounded p-3 space-y-2">
+          <div className="text-yellow-400 font-bold text-sm">{state.pendingEvent.name}</div>
+          <div className="text-gray-300 text-xs">{state.pendingEvent.description}</div>
+          <div className="text-red-400 text-xs">风险：{state.pendingEvent.risk}</div>
+          <div className="text-green-400 text-xs">奖励：{state.pendingEvent.reward}</div>
+          <div className="flex gap-2">
+            <button
+              onClick={() => onCampAction('event_accept')}
+              className="flex-1 py-1.5 bg-green-700 hover:bg-green-600 rounded text-xs font-bold"
+            >
+              接受
+            </button>
+            <button
+              onClick={() => onCampAction('event_decline')}
+              className="flex-1 py-1.5 bg-red-700 hover:bg-red-600 rounded text-xs font-bold"
+            >
+              拒绝
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* 清层反馈 */}
       {state.floorCleared && <FloorClearedBanner floor={currentFloor} />}
@@ -104,8 +151,8 @@ export default function ExplorationPanel({ state, onUseItem, onCampAction }) {
       {recentLogs.length > 0 && (
         <>
           <Divider />
-          <div className="bg-gray-800 rounded p-2 text-xs text-gray-300 border border-gray-700 space-y-0.5">
-            {recentLogs.map((msg, i) => <div key={i}>{msg}</div>)}
+          <div className="bg-gray-800 rounded p-2 text-xs border border-gray-700 space-y-0.5">
+            {recentLogs.map((msg, i) => <div key={i} className={logColor(msg)}>{msg}</div>)}
           </div>
         </>
       )}

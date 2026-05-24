@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { getEffectivePrice } from '../../game/camp/shopManager';
 
 const shopItems = [
   { key: 'SMALL_POTION',   name: 'HP Potion',       price: 20, desc: '恢复20HP' },
@@ -36,23 +37,30 @@ export default function ShopPanel({ state, onCampAction, onBack }) {
       )}
 
       <div className="space-y-1">
-        {shopItems.map(item => (
-          <div key={item.key} className="bg-gray-800 rounded p-2 border border-gray-700 flex justify-between items-center">
-            <div>
-              <div className="text-xs text-gray-200">{item.name}</div>
-              <div className="text-xs text-gray-500">{item.desc}</div>
+        {shopItems.map(item => {
+          const effectivePrice = getEffectivePrice(state, item.key);
+          const discounted = effectivePrice < item.price;
+          return (
+            <div key={item.key} className="bg-gray-800 rounded p-2 border border-gray-700 flex justify-between items-center">
+              <div>
+                <div className="text-xs text-gray-200">{item.name}</div>
+                <div className="text-xs text-gray-500">{item.desc}</div>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className={`text-xs ${discounted ? 'text-green-400' : 'text-yellow-400'}`}>
+                  {discounted && <span className="line-through text-gray-500 mr-1">{item.price}G</span>}
+                  {effectivePrice}G
+                </span>
+                <button
+                  onClick={() => handleBuy(item.key)}
+                  className="px-2 py-0.5 rounded text-xs text-white bg-green-700 hover:bg-green-600 active:bg-green-800"
+                >
+                  购买
+                </button>
+              </div>
             </div>
-            <div className="flex items-center gap-2">
-              <span className="text-yellow-400 text-xs">{item.price}G</span>
-              <button
-                onClick={() => handleBuy(item.key)}
-                className="px-2 py-0.5 rounded text-xs text-white bg-green-700 hover:bg-green-600 active:bg-green-800"
-              >
-                购买
-              </button>
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

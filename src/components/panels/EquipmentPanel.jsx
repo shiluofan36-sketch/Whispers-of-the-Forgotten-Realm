@@ -13,8 +13,7 @@ export default function EquipmentPanel({ state, onCampAction, onBack }) {
   });
 
   function handleEquip(slotIndex) {
-    const itemKey = inventory[slotIndex].itemKey;
-    const result = onCampAction('equip', itemKey);
+    const result = onCampAction('equip', slotIndex);
     setMessage(result);
     setTimeout(() => setMessage(null), 2000);
   }
@@ -47,6 +46,8 @@ export default function EquipmentPanel({ state, onCampAction, onBack }) {
           {Object.entries(slotNames).map(([slot, label]) => {
             const eq = equipment[slot];
             const info = eq ? getEquipmentInfo(eq.itemKey) : null;
+            const displayRarity = eq?.rarity || info?.rarity;
+            const displayBonus = eq?.generated?.bonus || info?.bonus;
             return (
               <div key={slot} className="bg-gray-800 rounded p-2 border border-gray-700">
                 <div className="flex justify-between items-center">
@@ -54,11 +55,11 @@ export default function EquipmentPanel({ state, onCampAction, onBack }) {
                     <span className="text-gray-400 text-xs">[{label}]</span>
                     {eq ? (
                       <>
-                        <span className={`ml-2 text-xs font-bold ${getRarityColor(info?.rarity)}`}>
+                        <span className={`ml-2 text-xs font-bold ${getRarityColor(displayRarity)}`}>
                           {eq.name}
                         </span>
-                        <span className={`ml-1 text-xs ${getRarityColor(info?.rarity)}`}>
-                          [{getRarityLabel(info?.rarity)}]
+                        <span className={`ml-1 text-xs ${getRarityColor(displayRarity)}`}>
+                          [{getRarityLabel(displayRarity)}]
                         </span>
                       </>
                     ) : (
@@ -74,9 +75,9 @@ export default function EquipmentPanel({ state, onCampAction, onBack }) {
                     </button>
                   )}
                 </div>
-                {eq && info && (
+                {eq && displayBonus && (
                   <div className="text-xs text-gray-500 mt-0.5 ml-7">
-                    {getBonusText(info.bonus)}
+                    {getBonusText(displayBonus)}
                   </div>
                 )}
               </div>
@@ -95,15 +96,19 @@ export default function EquipmentPanel({ state, onCampAction, onBack }) {
           {equippableItems.map((slot, i) => {
             const info = getEquipmentInfo(slot.itemKey);
             const realIndex = inventory.indexOf(slot);
+            const generated = slot.generated;
+            const displayName = generated ? generated.name : info?.name;
+            const displayBonus = generated ? generated.bonus : info?.bonus;
+            const displayRarity = generated ? generated.rarity : info?.rarity;
             return (
               <div
                 key={realIndex}
                 className="px-2 py-1 text-xs border-b border-gray-700 last:border-b-0"
               >
                 <div className="flex justify-between items-center">
-                  <span className={`font-bold ${getRarityColor(info?.rarity)}`}>
-                    {info?.name}
-                    <span className="ml-1 opacity-70">[{getRarityLabel(info?.rarity)}]</span>
+                  <span className={`font-bold ${getRarityColor(displayRarity)}`}>
+                    {displayName}
+                    <span className="ml-1 opacity-70">[{getRarityLabel(displayRarity)}]</span>
                   </span>
                   <button
                     onClick={() => handleEquip(realIndex)}
@@ -112,9 +117,9 @@ export default function EquipmentPanel({ state, onCampAction, onBack }) {
                     装备
                   </button>
                 </div>
-                {info && (
+                {displayBonus && (
                   <div className="text-xs text-gray-500 mt-0.5">
-                    {getBonusText(info.bonus)}
+                    {getBonusText(displayBonus)}
                   </div>
                 )}
               </div>

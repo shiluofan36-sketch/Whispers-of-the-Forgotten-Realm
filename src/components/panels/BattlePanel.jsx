@@ -1,10 +1,24 @@
 import { SKILLS, TOTAL_FLOORS } from '../../game/constants';
 import { getExpToNext } from '../../game/level';
-import { getSkillInfo, canUseSkill } from '../../game/skills';
+import { getSkillInfo, canUseSkill, getSkillCooldown } from '../../game/skills';
 import Divider from '../shared/Divider';
 import HpBar from '../shared/HpBar';
 import MpBar from '../shared/MpBar';
 import InventoryDisplay from '../shared/InventoryDisplay';
+
+function logColor(msg) {
+  if (msg.includes('CRIT')) return 'text-yellow-300 font-bold';
+  if (msg.includes('闪避')) return 'text-green-300';
+  if (msg.includes('恢复') || msg.includes('疗')) return 'text-green-400';
+  if (msg.includes('获得') || msg.includes('掉落')) return 'text-yellow-400';
+  if (msg.includes('随机事件') || msg.includes('[')) return 'text-purple-400';
+  if (msg.includes('灼烧') || msg.includes('中毒') || msg.includes('冻结') || msg.includes('流血')) return 'text-orange-400';
+  if (msg.includes('狂暴') || msg.includes('BOSS')) return 'text-red-400 font-bold';
+  if (msg.includes('升级') || msg.includes('LV')) return 'text-yellow-300';
+  if (msg.includes('成就')) return 'text-cyan-400';
+  if (msg.includes('伤害') || msg.includes('造成')) return 'text-gray-400';
+  return 'text-gray-500';
+}
 
 export default function BattlePanel({ state, onAction, onUseItem, onSkill }) {
   const { player, monster, battleTurn, inventory, battleLog,
@@ -73,22 +87,24 @@ export default function BattlePanel({ state, onAction, onUseItem, onSkill }) {
 
       {/* 技能 */}
       <div>
-        <div className="text-gray-400 mb-1 text-xs">技能 (Q/E/R)</div>
+        <div className="text-gray-400 mb-1 text-xs">技能</div>
         <div className="space-y-1">
           {skillKeys.map(skillKey => {
             const skill = getSkillInfo(skillKey);
             const usable = canUseSkill(state, skillKey);
+            const cd = getSkillCooldown(state, skillKey);
+            const cdText = cd > 0 ? ` (CD:${cd})` : '';
             return (
               <button
                 key={skillKey}
                 onClick={() => onSkill(skillKey)}
                 disabled={!usable}
-                title={usable ? `消耗 ${skill.mp} MP` : 'MP不足'}
+                title={!usable ? (cd > 0 ? `冷却中 ${cd}回合` : 'MP不足') : `消耗 ${skill.mp} MP`}
                 className={`w-full py-1.5 rounded font-bold text-xs text-white transition-colors
                   ${usable ? 'bg-purple-600 hover:bg-purple-500 active:bg-purple-700'
                            : 'bg-gray-700 text-gray-500 cursor-not-allowed'}`}
               >
-                [{skill.key.toUpperCase()}] {skill.name} ({skill.mp} MP)
+                [{skill.key.toUpperCase()}] {skill.name} ({skill.mp} MP){cdText}
               </button>
             );
           })}
@@ -104,8 +120,8 @@ export default function BattlePanel({ state, onAction, onUseItem, onSkill }) {
       <Divider />
 
       {/* 战斗日志 */}
-      <div className="bg-gray-800 rounded p-2 text-xs text-gray-300 border border-gray-700 max-h-32 overflow-y-auto space-y-0.5">
-        {battleLog.map((msg, i) => <div key={i}>{msg}</div>)}
+      <div className="bg-gray-800 rounded p-2 text-xs border border-gray-700 max-h-32 overflow-y-auto space-y-0.5">
+        {battleLog.map((msg, i) => <div key={i} className={logColor(msg)}>{msg}</div>)}
       </div>
     </>
   );

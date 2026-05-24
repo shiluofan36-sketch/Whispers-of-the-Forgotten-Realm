@@ -24,10 +24,12 @@ export default function InventoryDisplay({ inventory, onUseItem }) {
         {inventory.map((slot, i) => {
           const info = slot ? getItemInfo(slot.itemKey) : null;
           const eqInfo = slot ? getEquipmentInfo(slot.itemKey) : null;
+          const generated = slot?.generated;
           const isClicked = clickedSlot === i;
-          const displayName = info?.name || eqInfo?.name || '(空)';
+          const displayName = generated ? generated.name : (info?.name || eqInfo?.name || '(空)');
           const isEquipment = !!eqInfo;
-          const rarityColor = isEquipment ? getRarityColor(eqInfo.rarity) : 'text-yellow-300';
+          const displayRarity = generated ? generated.rarity : eqInfo?.rarity;
+          const rarityColor = isEquipment ? getRarityColor(displayRarity) : 'text-yellow-300';
 
           return (
             <div

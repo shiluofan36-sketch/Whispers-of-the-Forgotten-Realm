@@ -1,14 +1,17 @@
+import { lazy, Suspense } from 'react';
 import { GAME_PHASE } from '../game/constants';
 import CampPanel from './panels/CampPanel';
 import ExplorationPanel from './panels/ExplorationPanel';
-import BattlePanel from './panels/BattlePanel';
-import GameOverPanel from './panels/GameOverPanel';
-import VictoryPanel from './panels/VictoryPanel';
 
-/**
- * 游戏 HUD 面板路由
- * 根据 gamePhase 渲染对应面板，具体逻辑在各子面板文件中
- */
+// Phase 11: 懒加载非核心面板
+const BattlePanel = lazy(() => import('./panels/BattlePanel'));
+const GameOverPanel = lazy(() => import('./panels/GameOverPanel'));
+const VictoryPanel = lazy(() => import('./panels/VictoryPanel'));
+
+const LoadingFallback = () => (
+  <div className="text-gray-500 text-xs p-4 text-center">Loading...</div>
+);
+
 export default function GameUI({ state, onBattleAction, onUseItem, onSkill, onCampAction }) {
   const { gamePhase } = state;
 
@@ -19,19 +22,25 @@ export default function GameUI({ state, onBattleAction, onUseItem, onSkill, onCa
       </h1>
 
       {gamePhase === GAME_PHASE.CAMP && (
-        <CampPanel state={state} onCampAction={onCampAction} />
+        <div className="animate-fade-in"><CampPanel state={state} onCampAction={onCampAction} /></div>
       )}
       {gamePhase === GAME_PHASE.EXPLORATION && (
-        <ExplorationPanel state={state} onUseItem={onUseItem} onCampAction={onCampAction} />
+        <div className="animate-slide-in"><ExplorationPanel state={state} onUseItem={onUseItem} onCampAction={onCampAction} /></div>
       )}
       {gamePhase === GAME_PHASE.BATTLE && (
-        <BattlePanel state={state} onAction={onBattleAction} onUseItem={onUseItem} onSkill={onSkill} />
+        <Suspense fallback={<LoadingFallback />}>
+          <div className="animate-fade-in"><BattlePanel state={state} onAction={onBattleAction} onUseItem={onUseItem} onSkill={onSkill} /></div>
+        </Suspense>
       )}
       {gamePhase === GAME_PHASE.GAME_OVER && (
-        <GameOverPanel state={state} onCampAction={onCampAction} />
+        <Suspense fallback={<LoadingFallback />}>
+          <div className="animate-slide-in-up"><GameOverPanel state={state} onCampAction={onCampAction} /></div>
+        </Suspense>
       )}
       {gamePhase === GAME_PHASE.VICTORY && (
-        <VictoryPanel state={state} onCampAction={onCampAction} />
+        <Suspense fallback={<LoadingFallback />}>
+          <div className="animate-slide-in-up"><VictoryPanel state={state} onCampAction={onCampAction} /></div>
+        </Suspense>
       )}
     </div>
   );

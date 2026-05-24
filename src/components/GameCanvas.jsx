@@ -20,11 +20,15 @@ export default function GameCanvas({ game }) {
 
     // 渲染循环：使用 requestAnimationFrame 持续渲染
     let animId;
-    function loop() {
+    let lastTime = performance.now();
+    function loop(now) {
+      const dt = (now - lastTime) / 1000;
+      lastTime = now;
+      gameRef.current.updateEffects(Math.min(dt, 0.1));
       gameRef.current.renderFrame(ctx);
       animId = requestAnimationFrame(loop);
     }
-    loop();
+    loop(performance.now());
 
     // 键盘事件处理
     function onKeyDown(e) {

@@ -9,8 +9,8 @@ import { tryAddItem, removeFromSlot } from './stackSystem';
  * 向背包添加物品（自动堆叠）
  * @returns {boolean} 是否成功
  */
-export function addItem(state, itemKey, count = 1) {
-  const result = tryAddItem(state.inventory, state.inventorySlots, itemKey, count);
+export function addItem(state, itemKey, count = 1, generatedData = null) {
+  const result = tryAddItem(state.inventory, state.inventorySlots, itemKey, count, generatedData);
   if (!result.success) {
     state.battleLog.push('背包已满！');
   }
@@ -39,7 +39,8 @@ export function useItem(state, slotIndex) {
 
   switch (item.effect) {
     case 'heal': {
-      const heal = Math.min(item.value, player.maxHp - player.hp);
+      const healMult = 1 + (player.healPower || 0);
+      const heal = Math.min(Math.floor(item.value * healMult), player.maxHp - player.hp);
       player.hp += heal;
       state.battleLog.push(`使用了${item.name}，恢复了${heal}点生命`);
       break;

@@ -1,5 +1,19 @@
 import Divider from '../shared/Divider';
 import { getItemInfo } from '../../game/items';
+import { getEquipmentInfo, getRarityColor } from '../../game/equipment/equipmentManager';
+
+function getDisplayName(slot) {
+  if (slot.generated) return slot.generated.name;
+  const info = getItemInfo(slot.itemKey);
+  if (info) return info.name;
+  const eqInfo = getEquipmentInfo(slot.itemKey);
+  if (eqInfo) return eqInfo.name;
+  return '?';
+}
+
+function isEquipment(slot) {
+  return !!getEquipmentInfo(slot.itemKey);
+}
 
 export default function StoragePanel({ state, onCampAction, onBack }) {
   const { inventory, storage } = state;
@@ -30,14 +44,18 @@ export default function StoragePanel({ state, onCampAction, onBack }) {
             <div className="px-2 py-2 text-xs text-gray-600">(空)</div>
           )}
           {inventory.map((slot, i) => {
-            const info = getItemInfo(slot.itemKey);
+            const displayName = getDisplayName(slot);
+            const eq = isEquipment(slot);
+            const displayRarity = slot.generated?.rarity || getEquipmentInfo(slot.itemKey)?.rarity;
             return (
               <div
                 key={i}
                 onClick={() => handleDeposit(i)}
-                className="px-2 py-1 text-xs border-b border-gray-700 last:border-b-0 flex justify-between items-center cursor-pointer hover:bg-gray-600 text-yellow-300"
+                className="px-2 py-1 text-xs border-b border-gray-700 last:border-b-0 flex justify-between items-center cursor-pointer hover:bg-gray-600"
               >
-                <span>[{i + 1}] {info ? info.name : '?'}</span>
+                <span className={eq ? getRarityColor(displayRarity) : 'text-yellow-300'}>
+                  [{i + 1}] {displayName}
+                </span>
                 <span className="text-gray-400">x{slot.quantity}</span>
               </div>
             );
@@ -58,14 +76,18 @@ export default function StoragePanel({ state, onCampAction, onBack }) {
             <div className="px-2 py-2 text-xs text-gray-600">(空)</div>
           )}
           {storage.map((slot, i) => {
-            const info = getItemInfo(slot.itemKey);
+            const displayName = getDisplayName(slot);
+            const eq = isEquipment(slot);
+            const displayRarity = slot.generated?.rarity || getEquipmentInfo(slot.itemKey)?.rarity;
             return (
               <div
                 key={i}
                 onClick={() => handleWithdraw(i)}
-                className="px-2 py-1 text-xs border-b border-gray-700 last:border-b-0 flex justify-between items-center cursor-pointer hover:bg-gray-600 text-blue-300"
+                className="px-2 py-1 text-xs border-b border-gray-700 last:border-b-0 flex justify-between items-center cursor-pointer hover:bg-gray-600"
               >
-                <span>[{i + 1}] {info ? info.name : '?'}</span>
+                <span className={eq ? getRarityColor(displayRarity) : 'text-blue-300'}>
+                  [{i + 1}] {displayName}
+                </span>
                 <span className="text-gray-400">x{slot.quantity}</span>
               </div>
             );

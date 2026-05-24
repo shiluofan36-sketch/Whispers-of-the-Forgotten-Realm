@@ -18,8 +18,8 @@ export function depositToStorage(state, slotIndex, count) {
 
   if (depositCount <= 0 || depositCount > slot.quantity) return false;
 
-  // 存入仓库（无限容量，但保留堆叠逻辑）
-  const result = tryAddItem(state.storage, Infinity, slot.itemKey, depositCount);
+  // 存入仓库（保留词缀生成数据）
+  const result = tryAddItem(state.storage, Infinity, slot.itemKey, depositCount, slot.generated || null);
   if (result.success) {
     removeFromSlot(state.inventory, slotIndex, depositCount);
   }
@@ -49,7 +49,8 @@ export function withdrawFromStorage(state, storageIndex, count) {
     return false;
   }
 
-  const result = tryAddItem(state.inventory, state.inventorySlots, slot.itemKey, withdrawCount);
+  // 取出时保留词缀数据
+  const result = tryAddItem(state.inventory, state.inventorySlots, slot.itemKey, withdrawCount, slot.generated || null);
   if (result.success) {
     removeFromSlot(state.storage, storageIndex, withdrawCount);
   }

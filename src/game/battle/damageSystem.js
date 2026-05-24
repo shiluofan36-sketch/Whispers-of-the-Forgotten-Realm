@@ -11,9 +11,10 @@ export function calcPlayerDamage(player, monster) {
   let baseDmg = randomInt(player.attackMin, player.attackMax);
   baseDmg += player.strength;
 
-  const critRate = BASE_CRIT + player.agility * AGI_CRIT;
+  const critRate = BASE_CRIT + player.agility * AGI_CRIT + (player.critRateBonus || 0);
   const isCrit = Math.random() < critRate;
-  let total = isCrit ? Math.floor(baseDmg * CRIT_MULT) : baseDmg;
+  const critMult = CRIT_MULT + (player.critDamageBonus || 0);
+  let total = isCrit ? Math.floor(baseDmg * critMult) : baseDmg;
 
   if (monster.isDefending) {
     total = Math.floor(total / 2);
@@ -29,6 +30,12 @@ export function calcPlayerDamage(player, monster) {
  */
 export function applyMonsterDamage(state, rawDamage) {
   const { player } = state;
+
+  // Phase 12: 闪避
+  if ((player.dodgeRate || 0) > 0 && Math.random() < player.dodgeRate) {
+    return { damage: 0, notes: ['闪避'] };
+  }
+
   let reduced = Math.max(1, rawDamage - player.defense);
 
   const notes = [];

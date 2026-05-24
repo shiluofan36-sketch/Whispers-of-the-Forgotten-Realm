@@ -40,4 +40,10 @@ export function clearBuffs(state) {
   state.player.shieldTurns = 0;
   state.player.attackBuff = 0;
   state.player.defenseBuff = 0;
+  // Phase 10: 清除状态异常 + 小兵
+  state.statusEffects = [];
+  state.bossMinions = [];
+  if (state.monster) {
+    state.monster.statusEffects = [];
+  }
 }
