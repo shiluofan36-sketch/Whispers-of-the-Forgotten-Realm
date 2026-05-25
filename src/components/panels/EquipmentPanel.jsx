@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { getEquipmentInfo, getRarityColor, getRarityLabel, getBonusText } from '../../game/equipment/equipmentManager';
+import EquipmentIcon from '../shared/EquipmentIcon';
 
 export default function EquipmentPanel({ state, onCampAction, onBack }) {
   const [message, setMessage] = useState(null);
@@ -29,7 +30,7 @@ export default function EquipmentPanel({ state, onCampAction, onBack }) {
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between">
-        <div className="text-purple-400 font-bold">EQUIPMENT</div>
+        <div className="text-purple-400 font-bold font-pixel">EQUIPMENT</div>
         <button onClick={onBack} className="text-gray-400 hover:text-white text-xs">← 返回</button>
       </div>
 
@@ -51,11 +52,12 @@ export default function EquipmentPanel({ state, onCampAction, onBack }) {
             return (
               <div key={slot} className="bg-gray-800 rounded p-2 border border-gray-700">
                 <div className="flex justify-between items-center">
-                  <div>
+                  <div className="flex items-center gap-1">
+                    <EquipmentIcon slot={slot} rarity={displayRarity || 'common'} size={18} />
                     <span className="text-gray-400 text-xs">[{label}]</span>
                     {eq ? (
                       <>
-                        <span className={`ml-2 text-xs font-bold ${getRarityColor(displayRarity)}`}>
+                        <span className={`ml-1 text-xs font-bold ${getRarityColor(displayRarity)}`}>
                           {eq.name}
                         </span>
                         <span className={`ml-1 text-xs ${getRarityColor(displayRarity)}`}>

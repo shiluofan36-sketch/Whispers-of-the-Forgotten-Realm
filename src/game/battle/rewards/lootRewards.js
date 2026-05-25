@@ -28,7 +28,7 @@ export function grantLootRewards(state, monster) {
       const added = addItem(state, generated.itemKey, 1, generated);
       if (added) {
         state.battleLog.push(`${monster.name}掉落了${generated.name}！`);
-        triggerLootCard(state, generated.name, generated.quality || 'rare');
+        triggerLootCard(state, generated.name, generated.quality || 'rare', generated.itemKey, generated.slot);
         playSfx('loot');
       }
     }
@@ -42,7 +42,7 @@ export function grantLootRewards(state, monster) {
       const added = addItem(state, generated.itemKey, 1, generated);
       if (added) {
         state.battleLog.push(`${monster.name}掉落了${generated.name}！`);
-        triggerLootCard(state, generated.name, generated.quality || 'common');
+        triggerLootCard(state, generated.name, generated.quality || 'common', generated.itemKey, generated.slot);
       }
     }
   }

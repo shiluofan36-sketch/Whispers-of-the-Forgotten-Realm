@@ -50,6 +50,7 @@ export function playerAttack(state) {
     addFloatingText(state, pos.px, pos.py, `-${totalDmg}`, 'crit');
     addFloatingText(state, pos.px, pos.py - 20, 'CRIT!', 'crit');
     playSfx('crit');
+    if (state.particles) state.particles.emit('crit', pos.px, pos.py);
   } else {
     addFloatingText(state, pos.px, pos.py, `-${totalDmg}`, 'damage');
     playSfx('attack');
@@ -134,14 +135,7 @@ export function playerUseSkill(state, skillKey) {
     if (isCrit) {
       addFloatingText(state, pos.px, pos.py, `-${finalDmg}`, 'crit');
       addFloatingText(state, pos.px, pos.py - 20, 'CRIT!', 'crit');
-    } else {
-      addFloatingText(state, pos.px, pos.py, `-${finalDmg}`, 'damage');
-    }
-    triggerEntityFlash(monster, !!monster.bossKey);
-    playHitReaction(monster, !!monster.bossKey);
-
-    if (isCrit) {
-      state.battleLog.push(`CRITICAL HIT! 对${monster.name}造成${finalDmg}点伤害`);
+      if (state.particles) state.particles.emit('crit', pos.px, pos.py);
     } else {
       state.battleLog.push(`对${monster.name}造成${finalDmg}点伤害`);
     }
@@ -169,6 +163,7 @@ export function playerUseSkill(state, skillKey) {
       if (isCrit) {
         addFloatingText(state, pos.px, pos.py, `-${damage}`, 'crit');
         addFloatingText(state, pos.px, pos.py - 20, 'CRIT!', 'crit');
+        if (state.particles) state.particles.emit('crit', pos.px, pos.py);
       } else {
         addFloatingText(state, pos.px, pos.py, `-${damage}`, 'damage');
       }

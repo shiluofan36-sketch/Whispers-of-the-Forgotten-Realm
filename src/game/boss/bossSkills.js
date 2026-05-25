@@ -108,10 +108,11 @@ export function checkBossEnrage(state) {
     playEnrageAnim(boss);
     triggerBossHitStop(state);
 
-    // Boss狂暴警告大字 + 音效
+    // Boss狂暴警告大字 + 粒子 + 音效
     const pos = entityCenter(boss);
     addEnrageWarning(state, pos.px, pos.py - 20);
     triggerScreenShake(state, 6, 0.2);
     playSfx('boss_enrage');
+    if (state.particles) state.particles.emit('enrage', pos.px, pos.py);
   }
 }

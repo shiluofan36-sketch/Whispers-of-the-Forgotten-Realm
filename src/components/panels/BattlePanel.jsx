@@ -35,7 +35,7 @@ export default function BattlePanel({ state, onAction, onUseItem, onSkill }) {
 
       {/* 战斗标题 */}
       <div className="space-y-1">
-        <div className={`font-bold text-base ${isBossFloor ? 'text-red-500' : 'text-red-400'}`}>
+        <div className={`font-bold text-base font-pixel ${isBossFloor ? 'text-red-500' : 'text-red-400'}`}>
           战斗中：{monster?.name}
           {monster?.enraged && <span className="text-red-600 animate-pulse ml-1">[狂暴]</span>}
         </div>

@@ -53,6 +53,7 @@ export function monsterAct(state) {
           const extraDmg = Math.floor(damage * 0.5);
           player.hp = Math.max(0, player.hp - extraDmg);
           addFloatingText(state, pos.px, pos.py - 16, `CRIT! -${extraDmg}`, 'crit');
+          if (state.particles) state.particles.emit('crit', pos.px, pos.py);
         }
       }
     }

@@ -19,7 +19,7 @@ export default function MetaPanel({ state, onCampAction, onBack }) {
 
   return (
     <div className="space-y-3">
-      <div className="text-center text-yellow-400 font-bold text-sm">营地升级</div>
+      <div className="text-center text-yellow-400 font-bold text-sm font-pixel">营地升级</div>
       <div className="text-gray-500 text-xs text-center">
         升级永久保留，死亡不丢失
       </div>

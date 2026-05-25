@@ -1,50 +1,39 @@
 // 地图渲染：网格 / 障碍物 / 楼梯 / 房间
 import {
-  GRID_SIZE, CELL_SIZE, COLOR, OBSTACLE_STYLE, RENDER,
-  STAIRS_COLOR, STAIRS_LABEL, STAIRS_LOCKED_COLOR, STAIRS_LOCKED_LABEL,
+  GRID_SIZE, CELL_SIZE, RENDER,
 } from '../constants';
 import { ROOM_TYPES } from '../rooms/roomData';
+import { getObstacleTile, getStairsTile } from './tileRenderer';
 
-export function drawGrid(ctx) {
-  ctx.strokeStyle = COLOR.GRID;
-  ctx.lineWidth = 1;
-  for (let i = 0; i <= GRID_SIZE; i++) {
-    const pos = i * CELL_SIZE;
-    ctx.beginPath(); ctx.moveTo(pos, 0); ctx.lineTo(pos, GRID_SIZE * CELL_SIZE); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(0, pos); ctx.lineTo(GRID_SIZE * CELL_SIZE, pos); ctx.stroke();
-  }
-}
+// 网格绘制已移至 tileRenderer.drawTileGrid()
 
-export function drawObstacles(ctx, obstacles) {
-  const pad = RENDER.PADDING;
+export function drawObstacles(ctx, obstacles, biome) {
   for (const obs of obstacles) {
-    const style = obs.color ? { color: obs.color } : (OBSTACLE_STYLE[obs.type] || OBSTACLE_STYLE.rock);
     const px = obs.x * CELL_SIZE, py = obs.y * CELL_SIZE;
-    ctx.fillStyle = style.color;
-    ctx.fillRect(px + pad, py + pad, CELL_SIZE - pad * 2, CELL_SIZE - pad * 2);
-    ctx.fillStyle = RENDER.OBSTACLE_LABEL_COLOR;
-    ctx.font = RENDER.OBSTACLE_FONT;
-    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    const label = OBSTACLE_STYLE[obs.type] ? OBSTACLE_STYLE[obs.type].label : '?';
-    ctx.fillText(label, px + CELL_SIZE / 2, py + CELL_SIZE / 2);
+    const tileCanvas = getObstacleTile(biome, obs.type);
+    if (tileCanvas) {
+      ctx.drawImage(tileCanvas, px, py);
+    } else {
+      // 回退：纯色矩形
+      ctx.fillStyle = obs.color || '#888888';
+      ctx.fillRect(px + 4, py + 4, CELL_SIZE - 8, CELL_SIZE - 8);
+    }
   }
 }
 
-export function drawStairs(ctx, stairs, locked) {
-  const pad = RENDER.PADDING;
+export function drawStairs(ctx, stairs, locked, biome) {
   const px = stairs.x * CELL_SIZE, py = stairs.y * CELL_SIZE;
-  if (locked) {
-    ctx.fillStyle = STAIRS_LOCKED_COLOR;
-    ctx.fillRect(px + pad, py + pad, CELL_SIZE - pad * 2, CELL_SIZE - pad * 2);
-    ctx.fillStyle = '#ffffff'; ctx.font = 'bold 20px monospace';
-    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    ctx.fillText(STAIRS_LOCKED_LABEL, px + CELL_SIZE / 2, py + CELL_SIZE / 2);
+  const tileCanvas = getStairsTile(biome, locked);
+  if (tileCanvas) {
+    ctx.drawImage(tileCanvas, px, py);
   } else {
-    ctx.fillStyle = STAIRS_COLOR;
-    ctx.fillRect(px + pad, py + pad, CELL_SIZE - pad * 2, CELL_SIZE - pad * 2);
-    ctx.fillStyle = '#000000'; ctx.font = 'bold 20px monospace';
+    // 回退：纯色矩形 + 文字
+    ctx.fillStyle = locked ? '#cc3333' : '#ffdd00';
+    ctx.fillRect(px + 4, py + 4, CELL_SIZE - 8, CELL_SIZE - 8);
+    ctx.fillStyle = locked ? '#ffffff' : '#000000';
+    ctx.font = 'bold 20px monospace';
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    ctx.fillText(STAIRS_LABEL, px + CELL_SIZE / 2, py + CELL_SIZE / 2);
+    ctx.fillText(locked ? 'X' : '>', px + CELL_SIZE / 2, py + CELL_SIZE / 2);
   }
 }
 

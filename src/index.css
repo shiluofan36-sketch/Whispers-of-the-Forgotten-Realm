@@ -6,3 +6,33 @@ body {
   margin: 0;
   font-family: 'Courier New', monospace;
 }
+
+.font-pixel {
+  font-family: 'Press Start 2P', 'Courier New', monospace;
+  letter-spacing: -0.5px;
+}
+
+/* 像素风边框 — 用于面板和卡片 */
+.pixel-border {
+  border: 2px solid;
+  box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.5);
+}
+
+/* 像素风按钮底部 — 模拟按下深度 */
+.pixel-btn {
+  border: 2px solid;
+  border-bottom: 4px solid rgba(0, 0, 0, 0.4);
+  border-right: 4px solid rgba(0, 0, 0, 0.3);
+  transition: all 0.05s linear;
+}
+.pixel-btn:active:not(:disabled) {
+  border-bottom: 2px solid rgba(0, 0, 0, 0.4);
+  border-right: 2px solid rgba(0, 0, 0, 0.3);
+  transform: translate(2px, 2px);
+}
+
+/* 稀有度发光 */
+.rarity-glow-common { box-shadow: 0 0 4px rgba(156, 163, 175, 0.3); }
+.rarity-glow-rare   { box-shadow: 0 0 6px rgba(59, 130, 246, 0.4); }
+.rarity-glow-epic    { box-shadow: 0 0 8px rgba(168, 85, 247, 0.5); }
+.rarity-glow-legendary { box-shadow: 0 0 10px rgba(245, 158, 11, 0.6); }

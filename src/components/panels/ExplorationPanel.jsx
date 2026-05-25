@@ -30,7 +30,7 @@ export default function ExplorationPanel({ state, onUseItem, onCampAction }) {
     <>
       {/* 楼层信息 */}
       <div className="bg-gray-800 rounded p-2 border border-yellow-700 text-center">
-        <div className="text-yellow-400 font-bold text-sm">{floorName}</div>
+        <div className="text-yellow-400 font-bold text-sm font-pixel">{floorName}</div>
         <div className="text-gray-500 text-xs">
           Floor {currentFloor} / {TOTAL_FLOORS}
         </div>

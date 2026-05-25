@@ -24,7 +24,7 @@ export default function CampPanel({ state, onCampAction }) {
     <div className="space-y-3">
       {/* 营地标题 */}
       <div className="bg-gray-800 rounded p-3 border border-yellow-700 text-center">
-        <div className="text-yellow-400 font-bold text-lg">CAMP</div>
+        <div className="text-yellow-400 font-bold text-lg font-pixel">CAMP</div>
         <div className="text-gray-500 text-xs">安全区域 — 不会战斗、不会死亡</div>
       </div>
 
@@ -198,7 +198,7 @@ function NpcTalkView({ npcId, state, onCampAction, onBack }) {
   return (
     <div className="space-y-3">
       <div className="bg-gray-800 rounded p-3 border border-yellow-700">
-        <div className="text-yellow-400 font-bold text-sm">{npc.name}</div>
+        <div className="text-yellow-400 font-bold text-sm font-pixel">{npc.name}</div>
         <div className="text-gray-500 text-xs">{npc.description}</div>
       </div>
 

@@ -29,7 +29,7 @@ export default function StoragePanel({ state, onCampAction, onBack }) {
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between">
-        <div className="text-blue-400 font-bold">STORAGE</div>
+        <div className="text-blue-400 font-bold font-pixel">STORAGE</div>
         <button onClick={onBack} className="text-gray-400 hover:text-white text-xs">← 返回</button>
       </div>
 

@@ -15,6 +15,7 @@ export function generateFloor(state, floor) {
   state.floorName = config.name;
   state.isBossFloor = !!config.isBoss;
   state.floorBg = config.bg;
+  state.obstacleTheme = config.obstacleTheme || 'forest';
   state.stairs = null;
   state.floorCleared = false;
 

@@ -41,13 +41,15 @@ export function tickStatusEffects(state, entity, effects, isPlayer) {
       entity.hp = Math.max(0, entity.hp - config.damagePerTurn);
       messages.push(`${config.label}造成${config.damagePerTurn}点伤害`);
 
-      // 浮动文字
-      if (isPlayer) {
-        const pos = entityCenter(entity);
-        addFloatingText(state, pos.px, pos.py, `-${config.damagePerTurn}`, eff.type);
-      } else {
-        const pos = entityCenter(entity);
-        addFloatingText(state, pos.px, pos.py, `-${config.damagePerTurn}`, eff.type);
+      // 浮动文字 + 粒子
+      const pos = entityCenter(entity);
+      addFloatingText(state, pos.px, pos.py, `-${config.damagePerTurn}`, eff.type);
+
+      // 状态异常粒子映射
+      const statusParticleMap = { burn: 'enrage', poison: 'poison', freeze: 'ice', bleed: 'crit' };
+      const particleType = statusParticleMap[eff.type];
+      if (particleType && state.particles) {
+        state.particles.emit(particleType, pos.px, pos.py);
       }
     }
 

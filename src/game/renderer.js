@@ -5,8 +5,10 @@ import { renderFloatingTexts } from './effects/floatingTextManager';
 import { getScreenShakeOffset } from './effects/screenShake';
 import { renderSkillEffects } from './animation/skillEffectRenderer';
 import { renderLootCard } from './animation/lootAnimation';
-import { drawGrid, drawObstacles, drawStairs, drawRoom } from './renderer/mapRenderer';
+import { drawObstacles, drawStairs, drawRoom } from './renderer/mapRenderer';
 import { drawEntity, drawStatusIcons } from './renderer/entityRenderer';
+import { drawTileBackground, drawTileGrid, getBiomeBg } from './renderer/tileRenderer';
+import { renderAtmosphere } from './renderer/atmosphereRenderer';
 
 export function render(ctx, state) {
   const canvasWidth = GRID_SIZE * CELL_SIZE;
@@ -21,20 +23,29 @@ export function render(ctx, state) {
   ctx.save();
   ctx.translate(shake.dx, shake.dy);
 
-  ctx.fillStyle = state.gamePhase === GAME_PHASE.BATTLE
-    ? COLOR.BATTLE_BG
-    : (state.floorBg || COLOR.BG);
-  ctx.fillRect(-shake.dx, -shake.dy, canvasWidth + Math.abs(shake.dx) * 2, canvasHeight + Math.abs(shake.dy) * 2);
+  const biome = state.obstacleTheme || 'forest';
+  if (state.gamePhase === GAME_PHASE.BATTLE) {
+    ctx.fillStyle = COLOR.BATTLE_BG;
+    ctx.fillRect(-shake.dx, -shake.dy, canvasWidth + Math.abs(shake.dx) * 2, canvasHeight + Math.abs(shake.dy) * 2);
+    drawTileGrid(ctx, biome);
+  } else {
+    const biomeBg = getBiomeBg(biome);
+    ctx.fillStyle = biomeBg;
+    ctx.fillRect(-shake.dx, -shake.dy, canvasWidth + Math.abs(shake.dx) * 2, canvasHeight + Math.abs(shake.dy) * 2);
+    drawTileBackground(ctx, biome);
+    drawTileGrid(ctx, biome);
+  }
+  drawObstacles(ctx, state.obstacles, biome);
 
-  drawGrid(ctx);
-  drawObstacles(ctx, state.obstacles);
+  // Phase 14: 氛围叠加（瓦片之上、实体之下）
+  renderAtmosphere(ctx, state);
 
   if (state.room && state.gamePhase === GAME_PHASE.EXPLORATION) {
     drawRoom(ctx, state.room);
   }
 
   if (state.stairs && state.gamePhase === GAME_PHASE.EXPLORATION) {
-    drawStairs(ctx, state.stairs, state.stairsLocked);
+    drawStairs(ctx, state.stairs, state.stairsLocked, biome);
   }
 
   // Boss 小兵渲染
@@ -55,19 +66,11 @@ export function render(ctx, state) {
   // 技能特效（在实体之上、浮动文字之下）
   renderSkillEffects(ctx, state);
 
+  // Phase 14: 粒子系统（技能特效之上，浮动文字之下）
+  if (state.particles) state.particles.render(ctx);
+
   // 战斗边框
-  if (state.gamePhase === GAME_PHASE.BATTLE) {
-    if (state.isBossFloor) {
-      ctx.strokeStyle = '#ffaa00'; ctx.lineWidth = 6;
-      const bw = 3;
-      ctx.strokeRect(bw, bw, canvasWidth - bw * 2, canvasHeight - bw * 2);
-    } else {
-      ctx.strokeStyle = RENDER.BATTLE_BORDER_COLOR;
-      ctx.lineWidth = RENDER.BATTLE_BORDER_WIDTH;
-      const bw = RENDER.BATTLE_BORDER_WIDTH;
-      ctx.strokeRect(bw / 2, bw / 2, canvasWidth - bw, canvasHeight - bw);
-    }
-  }
+  drawBattleBorder(ctx, state, canvasWidth, canvasHeight);
 
   ctx.restore();
 
@@ -78,6 +81,21 @@ export function render(ctx, state) {
 
   if (state.gamePhase === GAME_PHASE.BATTLE) {
     drawStatusIcons(ctx, state);
+  }
+}
+
+function drawBattleBorder(ctx, state, w, h) {
+  if (state.gamePhase !== GAME_PHASE.BATTLE) return;
+  if (state.isBossFloor) {
+    ctx.strokeStyle = RENDER.BOSS_BORDER_COLOR;
+    ctx.lineWidth = RENDER.BOSS_BORDER_WIDTH;
+    const bw = RENDER.BOSS_BORDER_WIDTH / 2;
+    ctx.strokeRect(bw, bw, w - bw * 2, h - bw * 2);
+  } else {
+    ctx.strokeStyle = RENDER.BATTLE_BORDER_COLOR;
+    ctx.lineWidth = RENDER.BATTLE_BORDER_WIDTH;
+    const bw = RENDER.BATTLE_BORDER_WIDTH;
+    ctx.strokeRect(bw / 2, bw / 2, w - bw, h - bw);
   }
 }
 

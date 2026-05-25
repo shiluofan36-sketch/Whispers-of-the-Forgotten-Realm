@@ -72,10 +72,19 @@ export function unequipItem(state, slot) {
 
 export function getRarityColor(rarity) {
   switch (rarity) {
-    case 'legendary': return 'text-orange-400';
-    case 'epic':      return 'text-yellow-400';
-    case 'rare':      return 'text-blue-400';
-    default:          return 'text-gray-400';
+    case 'legendary': return 'text-rarity-legendary';
+    case 'epic':      return 'text-rarity-epic';
+    case 'rare':      return 'text-rarity-rare';
+    default:          return 'text-rarity-common';
+  }
+}
+
+export function getRarityHex(rarity) {
+  switch (rarity) {
+    case 'legendary': return '#F59E0B';
+    case 'epic':      return '#A855F7';
+    case 'rare':      return '#3B82F6';
+    default:          return '#9CA3AF';
   }
 }
 

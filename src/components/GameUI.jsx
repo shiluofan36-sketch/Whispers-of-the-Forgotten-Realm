@@ -16,9 +16,9 @@ export default function GameUI({ state, onBattleAction, onUseItem, onSkill, onCa
   const { gamePhase } = state;
 
   return (
-    <div className="w-72 ml-6 space-y-4 text-sm">
-      <h1 className="text-lg font-bold text-green-400 border-b border-gray-700 pb-2">
-        极简RPG
+    <div className="w-80 ml-4 space-y-3 text-sm">
+      <h1 className="text-lg font-bold text-green-400 border-b-2 border-gray-700 pb-2 font-pixel tracking-tight">
+        RPG
       </h1>
 
       {gamePhase === GAME_PHASE.CAMP && (

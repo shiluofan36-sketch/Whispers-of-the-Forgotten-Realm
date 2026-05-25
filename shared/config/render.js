@@ -13,6 +13,8 @@ export const RENDER = {
   PADDING: 4,
   BATTLE_BORDER_COLOR: '#ff4444',
   BATTLE_BORDER_WIDTH: 4,
+  BOSS_BORDER_COLOR: '#ffaa00',
+  BOSS_BORDER_WIDTH: 6,
   SHIELD_LINE_WIDTH: 3,
   HP_BAR_HEIGHT: 4,
   HP_BAR_OFFSET_Y: -6,
@@ -32,6 +34,21 @@ export const COLOR = {
   HP_BG:     '#333333',
   BATTLE_BG: '#2a1a1a',
   SHIELD:    '#44aaff',
+};
+
+// Phase 14: 统一稀有度颜色（单一配置源）
+export const RARITY_COLORS = {
+  common:    '#9CA3AF',
+  rare:      '#3B82F6',
+  epic:      '#A855F7',
+  legendary: '#F59E0B',
+};
+
+export const RARITY_GLOW = {
+  common:    null,
+  rare:      '#3B82F6',
+  epic:      '#A855F7',
+  legendary: '#F59E0B',
 };
 
 export const STAIRS_COLOR = '#ffdd00';

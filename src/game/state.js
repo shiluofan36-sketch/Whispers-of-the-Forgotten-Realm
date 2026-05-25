@@ -9,6 +9,7 @@ import { applySaveData } from './save/saveSchema';
 import { on } from './eventBus/gameEvents';
 import { checkAchievements } from './achievements/achievementManager';
 import { setWorldFlag } from './world/worldFlags';
+import { createParticleSystem } from './effects/particles/particleSystem';
 
 // 注册全局事件监听（仅执行一次）
 let listenersRegistered = false;
@@ -111,8 +112,9 @@ export function createInitialState() {
     bossDefeated: false,
     floorCleared: false,
 
-    // 背景色
+    // 背景色 + 生物群落主题
     floorBg: '#1a1a2e',
+    obstacleTheme: 'forest',
 
     // ============================================================
     //  Phase 7 新增字段
@@ -185,6 +187,9 @@ export function createInitialState() {
       skillEffects: [],
       lootCard: null,
     },
+
+    // Phase 14: 粒子系统
+    particles: createParticleSystem(200),
   };
 
   // 尝试加载存档

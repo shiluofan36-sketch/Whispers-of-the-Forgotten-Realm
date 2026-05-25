@@ -64,7 +64,7 @@ export function playAttackLunge(entity, targetX, targetY) {
     const isMonster = entity.isMinion || entity.typeKey || entity.bossKey;
     dirX = isMonster ? -1 : 1;
     dirY = 0;
-    distance = 24;
+    distance = 100;
   }
 
   entity.animState = {

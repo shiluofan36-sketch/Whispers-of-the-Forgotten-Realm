@@ -8,6 +8,9 @@ import { updateHitStop } from './animation/hitStopManager';
 import { updateSkillEffects } from './animation/skillEffectRenderer';
 import { updateLootCard } from './animation/lootAnimation';
 import { preloadSfx } from './audio/audioManager';
+import { initTileCache } from './renderer/tileRenderer';
+import { initSpriteCache } from './renderer/spriteManager';
+import { initIconCache } from './renderer/iconRenderer';
 import { handleInput } from './controllers/inputController';
 import { handleBattleAction, handleSkill, handleUseItem } from './controllers/battleController';
 import { handleCampAction } from './controllers/campController';
@@ -15,6 +18,9 @@ import { handleCampAction } from './controllers/campController';
 export function createGame() {
   const state = createInitialState();
   preloadSfx();
+  initTileCache();
+  initSpriteCache();
+  initIconCache();
 
   let onUpdate = null;
 
@@ -76,6 +82,9 @@ export function createGame() {
       updateAnimationState(state, dt);
       updateSkillEffects(state, dt);
       updateLootCard(state, dt);
+
+      // Phase 14: 粒子系统更新
+      if (state.particles) state.particles.update(dt);
     },
   };
 }

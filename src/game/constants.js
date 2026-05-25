@@ -41,3 +41,5 @@ export {
 export { ACHIEVEMENTS } from '../../shared/config/index.js';
 
 export { GAME_PHASE } from '../../shared/config/index.js';
+
+export { TILE_DATA, TILE_SIZE, BIOME_PALETTES } from '../../shared/config/index.js';

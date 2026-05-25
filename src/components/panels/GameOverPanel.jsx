@@ -1,7 +1,7 @@
 export default function GameOverPanel({ state, onCampAction }) {
   return (
     <div className="mt-4 p-4 rounded border-2 border-red-500 bg-red-900/50 text-center space-y-3">
-      <div className="text-lg font-bold text-red-400">败北</div>
+      <div className="text-lg font-bold text-red-400 font-pixel">败北</div>
       <div className="text-xs text-gray-400 space-y-1">
         <div>等级：LV {state.player.level}</div>
         <div>总回合数：{state.turn}</div>

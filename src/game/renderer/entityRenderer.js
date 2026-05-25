@@ -1,5 +1,7 @@
 // 实体渲染：玩家 / 怪物 / Boss / 血条 / 状态图标
 import { GRID_SIZE, CELL_SIZE, COLOR, RENDER, GAME_PHASE } from '../constants';
+import { getSpriteFrame, hasSpriteData } from './spriteManager';
+import { getCurrentFrame } from './animationFrameController';
 
 export function drawHpBar(ctx, x, y, width, hp, maxHp) {
   const height = RENDER.HP_BAR_HEIGHT;
@@ -8,6 +10,17 @@ export function drawHpBar(ctx, x, y, width, hp, maxHp) {
   ctx.fillRect(x, y, width, height);
   ctx.fillStyle = COLOR.HP_BAR;
   ctx.fillRect(x, y, width * ratio, height);
+}
+
+/**
+ * 从实体推断精灵类型键
+ */
+function getEntitySpriteKey(entity) {
+  if (entity.bossKey) return entity.bossKey;
+  if (entity.typeKey) return entity.typeKey;
+  // 玩家检测：有 equipment 属性即为玩家
+  if (entity.equipment) return 'player';
+  return null;
 }
 
 export function drawEntity(ctx, entity, color, label, state) {
@@ -70,11 +83,48 @@ export function drawEntity(ctx, entity, color, label, state) {
     py += animOffsetY;
   }
 
-  let fillColor = color;
-  if (entity.flashTimer > 0) fillColor = '#ff6666';
+  // 精灵渲染：获取当前动画帧
+  const spriteKey = getEntitySpriteKey(entity);
+  const globalTime = state.animation?.idlePhase || 0;
+  const { animType, frameIndex } = getCurrentFrame(entity, globalTime);
+  const spriteCanvas = spriteKey ? getSpriteFrame(spriteKey, animType, frameIndex) : null;
 
-  ctx.fillStyle = fillColor;
-  ctx.fillRect(px + pad, py + pad, CELL_SIZE - pad * 2, CELL_SIZE - pad * 2);
+  if (spriteCanvas) {
+    // 使用精灵绘制
+    const spriteSize = entity.bossKey ? 64 : 32;
+    // 精灵绘制在 CELL_SIZE 区域内，保持宽高比
+    const drawSize = CELL_SIZE - pad * 2;
+    const spriteX = px + pad;
+    const spriteY = py + pad;
+
+    if (entity.flashTimer > 0) {
+      // 受击闪烁：红色叠加
+      ctx.drawImage(spriteCanvas, spriteX, spriteY, drawSize, drawSize);
+      ctx.fillStyle = 'rgba(255, 100, 100, 0.4)';
+      ctx.fillRect(spriteX, spriteY, drawSize, drawSize);
+    } else {
+      ctx.drawImage(spriteCanvas, spriteX, spriteY, drawSize, drawSize);
+    }
+  } else {
+    // 回退：纯色矩形 + 标签（旧式渲染）
+    let fillColor = color;
+    if (entity.flashTimer > 0) fillColor = '#ff6666';
+
+    ctx.fillStyle = fillColor;
+    ctx.fillRect(px + pad, py + pad, CELL_SIZE - pad * 2, CELL_SIZE - pad * 2);
+
+    ctx.fillStyle = entity.isElite ? '#ffdd00' : RENDER.ENTITY_LABEL_COLOR;
+    ctx.font = entity.isElite ? 'bold 13px monospace' : RENDER.ENTITY_FONT;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    let displayLabel = label;
+    if (entity.isElite) displayLabel = 'E';
+    ctx.fillText(displayLabel, cellCenterX, cellCenterY);
+
+    if (entity.isElite) {
+      ctx.fillStyle = '#ffdd00'; ctx.font = 'bold 10px monospace';
+      ctx.fillText('[Elite]', cellCenterX, cellCenterY - 16);
+    }
+  }
 
   if (isDefending) {
     ctx.strokeStyle = COLOR.SHIELD;
@@ -95,18 +145,6 @@ export function drawEntity(ctx, entity, color, label, state) {
     ctx.beginPath();
     ctx.arc(cellCenterX, cellCenterY, CELL_SIZE / 2 + pulseR, 0, Math.PI * 2);
     ctx.stroke();
-  }
-
-  ctx.fillStyle = entity.isElite ? '#ffdd00' : RENDER.ENTITY_LABEL_COLOR;
-  ctx.font = entity.isElite ? 'bold 13px monospace' : RENDER.ENTITY_FONT;
-  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-  let displayLabel = label;
-  if (entity.isElite) displayLabel = 'E';
-  ctx.fillText(displayLabel, cellCenterX, cellCenterY);
-
-  if (entity.isElite) {
-    ctx.fillStyle = '#ffdd00'; ctx.font = 'bold 10px monospace';
-    ctx.fillText('[Elite]', cellCenterX, cellCenterY - 16);
   }
 
   drawHpBar(ctx, px + pad, py + RENDER.HP_BAR_OFFSET_Y, CELL_SIZE - pad * 2, hp, maxHp);

@@ -14,13 +14,15 @@
  *   { itemName, quality, color, glowColor, timer, duration }
  */
 
+import { getIconForItem, getIconForSlot, drawIcon } from '../renderer/iconRenderer';
+
 const DURATION = 1.5; // 1500ms
 
 const QUALITY_COLORS = {
-  common:    { color: '#888888', glow: null },
-  rare:      { color: '#4488ff', glow: '#4488ff' },
-  epic:      { color: '#aa44ff', glow: '#aa44ff' },
-  legendary: { color: '#ffaa00', glow: '#ffcc44' },
+  common:    { color: '#9CA3AF', glow: null },
+  rare:      { color: '#3B82F6', glow: '#3B82F6' },
+  epic:      { color: '#A855F7', glow: '#A855F7' },
+  legendary: { color: '#F59E0B', glow: '#F59E0B' },
 };
 
 /**
@@ -29,12 +31,19 @@ const QUALITY_COLORS = {
  * @param {string} itemName - 装备名称
  * @param {string} quality - common|rare|epic|legendary
  */
-export function triggerLootCard(state, itemName, quality = 'common') {
+export function triggerLootCard(state, itemName, quality = 'common', itemKey = null, slot = null) {
   if (!state.animation) state.animation = {};
+
+  // 掉落粒子（画布中心）
+  if (state.particles) {
+    state.particles.emit('loot', 240, 240);
+  }
 
   const qc = QUALITY_COLORS[quality] || QUALITY_COLORS.common;
   state.animation.lootCard = {
     itemName,
+    itemKey,
+    slot,
     quality,
     color: qc.color,
     glowColor: qc.glow,
@@ -107,12 +116,12 @@ export function renderLootCard(ctx, state) {
   ctx.fillStyle = card.color;
   ctx.fillRect(-hw, -hh, cardW, 4);
 
-  // 图标
-  ctx.fillStyle = card.color;
-  ctx.font = '18px monospace';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText('⚔', 0, -6);
+  // 图标（像素风）— 优先 itemKey，回退 slot，最后名称
+  let iconKey = getIconForItem(card.itemKey);
+  if (iconKey === 'sword' && card.slot) {
+    iconKey = getIconForSlot(card.slot);
+  }
+  drawIcon(ctx, iconKey, card.quality, 0, -6, 24);
 
   // 装备名称
   ctx.fillStyle = '#ffffff';
