@@ -26,7 +26,7 @@ export function monsterAct(state) {
       return;
     }
 
-    const pos = entityCenter(player);
+    const pos = entityCenter(player, state);
     const blockTypes = ['护盾减半', '防御卷轴减半', '防御姿态减半'];
     const isBlocked = notes.some(n => blockTypes.includes(n));
     if (isBlocked) {

@@ -17,6 +17,7 @@ export default function GameCanvas({ game }) {
   useEffect(() => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
+    ctx.imageSmoothingEnabled = false;
 
     // 渲染循环：使用 requestAnimationFrame 持续渲染
     let animId;
@@ -40,9 +41,16 @@ export default function GameCanvas({ game }) {
     }
     window.addEventListener('keydown', onKeyDown);
 
+    // 点击 canvas 时关闭掉落卡片
+    function onClick() {
+      gameRef.current.dismissLootCard();
+    }
+    canvas.addEventListener('click', onClick);
+
     return () => {
       cancelAnimationFrame(animId);
       window.removeEventListener('keydown', onKeyDown);
+      canvas.removeEventListener('click', onClick);
     };
   }, []);
 
@@ -53,7 +61,7 @@ export default function GameCanvas({ game }) {
       ref={canvasRef}
       width={size}
       height={size}
-      className="border-2 border-gray-600 rounded"
+      className="pixel-canvas max-h-[95vh] max-w-[calc(100vw-380px)]"
     />
   );
 }

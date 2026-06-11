@@ -53,7 +53,7 @@ export function deleteSave() {
  * 触发时机：回营地、购买物品、存入仓库、升级、解锁新楼层
  */
 export function autoSave(state, reason) {
-  const triggers = ['return_camp', 'shop_buy', 'storage_deposit', 'level_up', 'floor_unlock', 'meta_buy'];
+  const triggers = ['return_camp', 'shop_buy', 'storage_deposit', 'level_up', 'floor_unlock', 'meta_buy', 'tutorial_progress'];
   if (triggers.includes(reason)) {
     saveGame(state);
   }

@@ -5,6 +5,7 @@ import Divider from '../shared/Divider';
 import HpBar from '../shared/HpBar';
 import MpBar from '../shared/MpBar';
 import InventoryDisplay from '../shared/InventoryDisplay';
+import TutorialOverlay from './TutorialOverlay';
 
 function logColor(msg) {
   if (msg.includes('CRIT')) return 'text-yellow-300 font-bold';
@@ -20,13 +21,31 @@ function logColor(msg) {
   return 'text-gray-500';
 }
 
-export default function BattlePanel({ state, onAction, onUseItem, onSkill }) {
+export default function BattlePanel({ state, onAction, onUseItem, onSkill, onCampAction }) {
   const { player, monster, battleTurn, inventory, battleLog,
           currentFloor, floorName, isBossFloor, expeditionGold } = state;
   const skillKeys = Object.keys(SKILLS);
 
   return (
     <>
+      {/* 教程引导覆盖层 */}
+      <TutorialOverlay state={state} />
+
+      {/* 教程Boss投降对话框 */}
+      {state.pendingEvent && state.pendingEvent.isTutorial && (
+        <div className="bg-amber-900 border-2 border-amber-500 rounded p-3 space-y-2 mb-2">
+          <div className="text-amber-400 font-bold text-sm">{state.pendingEvent.name}</div>
+          <div className="text-gray-300 text-xs whitespace-pre-wrap">{state.pendingEvent.description}</div>
+          <div className="text-green-400 text-xs">奖励：{state.pendingEvent.reward}</div>
+          <button
+            onClick={() => onCampAction('event_accept')}
+            className="w-full py-1.5 bg-amber-700 hover:bg-amber-600 rounded text-xs font-bold text-white"
+          >
+            继续
+          </button>
+        </div>
+      )}
+
       {/* 楼层标识 */}
       <div className="text-xs text-gray-500">
         {floorName} — Floor {currentFloor}/{TOTAL_FLOORS}

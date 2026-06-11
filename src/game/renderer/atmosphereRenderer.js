@@ -259,18 +259,24 @@ const BIOME_ATMO = {
  * 应在 tiles 之后、entities 之前调用
  */
 export function renderAtmosphere(ctx, state) {
-  if (state.gamePhase !== GAME_PHASE.EXPLORATION) return;
+  const phase = state.gamePhase;
+  if (phase !== GAME_PHASE.EXPLORATION && phase !== GAME_PHASE.BATTLE) return;
 
   const biome = state.obstacleTheme || 'forest';
+  const intensity = phase === GAME_PHASE.BATTLE ? 0.45 : 1.0;
+
+  ctx.save();
+  ctx.globalAlpha = intensity;
 
   // Boss 房间特殊氛围
   if (state.isBossFloor) {
     renderBossAtmo(ctx, state);
-    return;
+  } else {
+    const renderFn = BIOME_ATMO[biome];
+    if (renderFn) {
+      renderFn(ctx, state);
+    }
   }
 
-  const renderFn = BIOME_ATMO[biome];
-  if (renderFn) {
-    renderFn(ctx, state);
-  }
+  ctx.restore();
 }

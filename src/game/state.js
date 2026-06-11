@@ -10,6 +10,7 @@ import { on } from './eventBus/gameEvents';
 import { checkAchievements } from './achievements/achievementManager';
 import { setWorldFlag } from './world/worldFlags';
 import { createParticleSystem } from './effects/particles/particleSystem';
+import { startTutorialIfNeeded } from './tutorial/tutorialManager';
 
 // 注册全局事件监听（仅执行一次）
 let listenersRegistered = false;
@@ -186,10 +187,17 @@ export function createInitialState() {
       hitStopTimer: 0,
       skillEffects: [],
       lootCard: null,
+      monsterMoveTimer: 0,
+      monsterMoveInterval: 2.0,
     },
 
     // Phase 14: 粒子系统
     particles: createParticleSystem(200),
+
+    // Tutorial system
+    tutorialStep: 0,
+    isTutorialFloor: false,
+    tutorialMarker: null,
   };
 
   // 尝试加载存档
@@ -197,6 +205,9 @@ export function createInitialState() {
   if (saveData) {
     applySaveData(state, saveData);
   }
+
+  // 教程检测（存档加载后）
+  startTutorialIfNeeded(state);
 
   return state;
 }

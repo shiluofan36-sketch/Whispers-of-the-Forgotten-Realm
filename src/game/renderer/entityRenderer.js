@@ -13,14 +13,14 @@ export function drawHpBar(ctx, x, y, width, hp, maxHp) {
 }
 
 /**
- * 从实体推断精灵类型键
+ * 从实体推断精灵类型键和朝向
  */
 function getEntitySpriteKey(entity) {
-  if (entity.bossKey) return entity.bossKey;
-  if (entity.typeKey) return entity.typeKey;
-  // 玩家检测：有 equipment 属性即为玩家
-  if (entity.equipment) return 'player';
-  return null;
+  const direction = entity.facing || 'down';
+  if (entity.bossKey) return { spriteKey: entity.bossKey, direction };
+  if (entity.typeKey) return { spriteKey: entity.typeKey, direction };
+  if (entity.equipment) return { spriteKey: 'player', direction };
+  return { spriteKey: null, direction };
 }
 
 export function drawEntity(ctx, entity, color, label, state) {
@@ -84,15 +84,13 @@ export function drawEntity(ctx, entity, color, label, state) {
   }
 
   // 精灵渲染：获取当前动画帧
-  const spriteKey = getEntitySpriteKey(entity);
+  const { spriteKey, direction } = getEntitySpriteKey(entity);
   const globalTime = state.animation?.idlePhase || 0;
   const { animType, frameIndex } = getCurrentFrame(entity, globalTime);
-  const spriteCanvas = spriteKey ? getSpriteFrame(spriteKey, animType, frameIndex) : null;
+  const spriteCanvas = spriteKey ? getSpriteFrame(spriteKey, animType, frameIndex, direction) : null;
 
   if (spriteCanvas) {
-    // 使用精灵绘制
-    const spriteSize = entity.bossKey ? 64 : 32;
-    // 精灵绘制在 CELL_SIZE 区域内，保持宽高比
+    // 精灵绘制：64×64 普通 / 96×96 Boss，drawImage 自动缩放到 drawSize
     const drawSize = CELL_SIZE - pad * 2;
     const spriteX = px + pad;
     const spriteY = py + pad;

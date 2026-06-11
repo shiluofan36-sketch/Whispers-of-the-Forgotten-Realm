@@ -1,4 +1,4 @@
-import { CELL_SIZE } from '../constants';
+import { CELL_SIZE, GRID_SIZE, GAME_PHASE } from '../constants';
 
 /**
  * 浮动文字管理器
@@ -22,9 +22,17 @@ const COLORS = {
 };
 
 /**
- * 网格坐标转画布像素坐标（实体中心上方）
+ * 实体中心像素坐标（战斗模式下使用屏幕固定位置）
  */
-export function entityCenter(entity) {
+export function entityCenter(entity, state) {
+  if (state && state.gamePhase === GAME_PHASE.BATTLE) {
+    const canvasSize = GRID_SIZE * CELL_SIZE;
+    const isMonster = entity.typeKey || entity.bossKey || entity.isMinion;
+    return {
+      px: isMonster ? canvasSize * 0.75 : canvasSize * 0.25,
+      py: canvasSize * 0.5 - 20,
+    };
+  }
   return {
     px: entity.x * CELL_SIZE + CELL_SIZE / 2,
     py: entity.y * CELL_SIZE + 10,

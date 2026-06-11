@@ -5,6 +5,7 @@ import HpBar from '../shared/HpBar';
 import MpBar from '../shared/MpBar';
 import InventoryDisplay from '../shared/InventoryDisplay';
 import FloorClearedBanner from '../shared/FloorClearedBanner';
+import TutorialOverlay from './TutorialOverlay';
 
 function logColor(msg) {
   if (msg.includes('CRIT')) return 'text-yellow-300 font-bold';
@@ -28,6 +29,9 @@ export default function ExplorationPanel({ state, onUseItem, onCampAction }) {
 
   return (
     <>
+      {/* 教程引导覆盖层 */}
+      <TutorialOverlay state={state} />
+
       {/* 楼层信息 */}
       <div className="bg-gray-800 rounded p-2 border border-yellow-700 text-center">
         <div className="text-yellow-400 font-bold text-sm font-pixel">{floorName}</div>
@@ -137,8 +141,8 @@ export default function ExplorationPanel({ state, onUseItem, onCampAction }) {
       {/* 背包 */}
       <InventoryDisplay inventory={inventory} onUseItem={onUseItem} />
 
-      {/* 返回营地按钮 */}
-      {state.enemiesRemaining <= 0 && !state.isBossFloor && (
+      {/* 返回营地按钮（教程期间隐藏） */}
+      {state.enemiesRemaining <= 0 && !state.isBossFloor && !state.isTutorialFloor && (
         <button
           onClick={() => onCampAction('return_camp')}
           className="w-full py-2 rounded font-bold text-white bg-purple-700 hover:bg-purple-600 active:bg-purple-800 transition-colors text-xs"

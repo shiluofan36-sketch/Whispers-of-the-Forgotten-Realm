@@ -1,16 +1,22 @@
 const BASE_URL = '/api/v1';
 const TIMEOUT = 5000;
 
-async function request(method, path, body = null) {
+function getToken() {
+  return localStorage.getItem('rpg_token');
+}
+
+async function request(method, path, body = null, auth = false) {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), TIMEOUT);
 
   try {
-    const opts = {
-      method,
-      headers: { 'Content-Type': 'application/json' },
-      signal: controller.signal,
-    };
+    const headers = { 'Content-Type': 'application/json' };
+    if (auth) {
+      const token = getToken();
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    const opts = { method, headers, signal: controller.signal };
     if (body) opts.body = JSON.stringify(body);
 
     const res = await fetch(`${BASE_URL}${path}`, opts);
@@ -29,6 +35,8 @@ async function request(method, path, body = null) {
 }
 
 export const apiClient = {
-  get: (path) => request('GET', path),
-  post: (path, body) => request('POST', path, body),
+  get: (path, auth = false) => request('GET', path, null, auth),
+  post: (path, body, auth = false) => request('POST', path, body, auth),
+  put: (path, body, auth = false) => request('PUT', path, body, auth),
+  delete: (path, auth = false) => request('DELETE', path, null, auth),
 };

@@ -4,11 +4,21 @@ import { scaleMonsterForFloor } from './difficultyScaling';
 import { createBoss } from '../boss/bossFactory';
 import { lockStairs } from './stairsSystem';
 import { generateRoomForFloor } from '../rooms/roomManager';
+import { resetVisitedTiles, updateVisitedTiles } from '../renderer/fogOfWar';
+import { generateTutorialFloor } from '../tutorial/tutorialManager';
 
 /**
  * 为指定楼层生成完整地图：障碍物 + 怪物 + 楼梯
  */
 export function generateFloor(state, floor) {
+  // 教程楼层使用固定布局
+  if (state.isTutorialFloor) {
+    // 根据当前教程步骤确定楼层
+    const tutorialFloor = state.tutorialStep <= 2 ? 1 : state.tutorialStep <= 4 ? 2 : 3;
+    generateTutorialFloor(state, tutorialFloor);
+    return;
+  }
+  // ... rest of original function
   const config = FLOORS[floor];
 
   state.currentFloor = floor;
@@ -48,6 +58,8 @@ export function generateFloor(state, floor) {
 
   state.battleLog = [];
   state.gamePhase = 'exploration';
+  resetVisitedTiles(state);
+  updateVisitedTiles(state);
   state.battleLog.push(`进入${config.name}`);
 }
 

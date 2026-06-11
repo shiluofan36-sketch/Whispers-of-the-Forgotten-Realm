@@ -1,6 +1,15 @@
-import { MONSTER_TYPES, ELITE_MODIFIERS, ELITE_CHANCE } from './constants';
-import { findEmptyCell } from './map';
-import { initAnimState } from './animation/animationManager';
+import { MONSTER_TYPES, ELITE_MODIFIERS, ELITE_CHANCE, GRID_SIZE } from './constants';
+import { findEmptyCell, isObstacle, isInBounds } from './map';
+import { initAnimState, playWalkAnim } from './animation/animationManager';
+
+const MONSTER_MOVE_CHANCE = 0.85;
+
+const DIRECTIONS = [
+  { dx: 0, dy: -1 },
+  { dx: 0, dy: 1 },
+  { dx: -1, dy: 0 },
+  { dx: 1, dy: 0 },
+];
 
 /**
  * 生成一个新怪物（含精英怪判定）
@@ -65,4 +74,38 @@ function applyEliteModifier(monster) {
 
   // 名字前缀
   monster.name = `[${mod.name}]${monster.name}`;
+}
+
+/**
+ * 怪物随机移动一步（由独立计时器驱动，不与玩家移动挂钩）
+ * 不允许穿过障碍物、玩家、楼梯、房间
+ * @returns {boolean} 是否实际移动了
+ */
+export function moveMonster(state) {
+  if (!state.monster) return false;
+  if (state.gamePhase !== 'exploration') return false;
+  if (Math.random() > MONSTER_MOVE_CHANCE) return false;
+
+  const { monster, player, obstacles, stairs, room } = state;
+
+  // 随机打乱方向
+  const shuffled = [...DIRECTIONS].sort(() => Math.random() - 0.5);
+
+  for (const { dx, dy } of shuffled) {
+    const nx = monster.x + dx;
+    const ny = monster.y + dy;
+
+    if (!isInBounds(nx, ny)) continue;
+    if (isObstacle(nx, ny, obstacles)) continue;
+    if (player.x === nx && player.y === ny) continue;
+    if (stairs && stairs.x === nx && stairs.y === ny) continue;
+    if (room && room.x === nx && room.y === ny) continue;
+
+    monster.x = nx;
+    monster.y = ny;
+    playWalkAnim(monster, dx, dy);
+    return true;
+  }
+
+  return false; // 无路可走
 }

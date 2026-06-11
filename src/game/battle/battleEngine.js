@@ -4,6 +4,8 @@ import { monsterAct } from './monsterAI';
 import { grantBattleRewards, grantBattleDefeat } from './battleRewards';
 import { executeBossAction } from '../boss/bossAI';
 import { tickStatusEffects, checkFreezeBlock, triggerBleedOnAction } from '../statusEffects/statusManager';
+import { DIR } from '../renderer/spriteDirections';
+import { checkTutorialBossDefeated } from '../tutorial/tutorialBossAI';
 
 /**
  * 开始战斗
@@ -14,6 +16,9 @@ export function startBattle(state) {
   state.battleTurn = 1;
   state.player.isDefending = false;
   state.monster.isDefending = false;
+  // 战斗朝向：玩家面朝右，怪物面朝左
+  state.player.facing = DIR.RIGHT;
+  state.monster.facing = DIR.LEFT;
   state.battleLog.push(`战斗开始！遭遇了${state.monster.name}！`);
 }
 
@@ -79,8 +84,23 @@ export function executeBattleTurn(state, input) {
 
   // 2. 检查怪物是否死亡
   if (state.monster.hp <= 0) {
+    // 教程怪物：阻止真正的死亡，特殊处理
+    if (state.monster.isTutorial) {
+      if (state.monster.bossKey) {
+        checkTutorialBossDefeated(state);
+      } else {
+        // 教程普通怪物：正常结算但不重生
+        grantBattleRewards(state);
+      }
+      return;
+    }
     grantBattleRewards(state);
     return;
+  }
+
+  // 教程Boss：每回合检查是否应该投降（HP降到1的情况）
+  if (state.monster.isTutorial && state.monster.bossKey) {
+    if (checkTutorialBossDefeated(state)) return;
   }
 
   // 3. 怪物/Boss行动（怪物冻结检查）
@@ -103,6 +123,12 @@ export function executeBattleTurn(state, input) {
 
   // 4. 检查玩家是否死亡
   if (state.player.hp <= 0) {
+    // 教程中不会死亡
+    if (state.isTutorialFloor || state.monster?.isTutorial) {
+      state.player.hp = 1;
+      state.battleLog.push('教官出手救了你！「注意血量，合理使用治疗和防御。」');
+      return;
+    }
     grantBattleDefeat(state);
   }
 }

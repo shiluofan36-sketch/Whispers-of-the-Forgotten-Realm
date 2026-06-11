@@ -38,7 +38,7 @@ export function bossSpecialAttack(state, skill) {
     state.battleLog.push(`你受到了${skill.status}效果！`);
   }
 
-  const pos = entityCenter(state.player);
+  const pos = entityCenter(state.player, state);
   addFloatingText(state, pos.px, pos.py, `-${damage}`, 'damage');
   triggerPlayerFlash(state.player);
   playHitReaction(state.player, true);
@@ -76,7 +76,7 @@ export function bossAttack(state) {
   const noteStr = notes.length > 0 ? `（${notes.join('，')}）` : '';
   state.battleLog.push(`${monster.name}对你造成${damage}点伤害${noteStr}`);
 
-  const pos = entityCenter(state.player);
+  const pos = entityCenter(state.player, state);
   addFloatingText(state, pos.px, pos.py, `-${damage}`, 'damage');
   triggerPlayerFlash(state.player);
   playHitReaction(state.player, true);
@@ -109,7 +109,7 @@ export function checkBossEnrage(state) {
     triggerBossHitStop(state);
 
     // Boss狂暴警告大字 + 粒子 + 音效
-    const pos = entityCenter(boss);
+    const pos = entityCenter(boss, state);
     addEnrageWarning(state, pos.px, pos.py - 20);
     triggerScreenShake(state, 6, 0.2);
     playSfx('boss_enrage');

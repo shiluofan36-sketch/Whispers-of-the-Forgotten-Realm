@@ -1,5 +1,11 @@
 // 装备类型（唯一配置源：shared/config/equipment.js）
 export const EQUIPMENT_TYPES = {
+  // 教程奖励
+  TUTORIAL_SWORD: {
+    itemKey: 'TUTORIAL_SWORD', name: '训练之剑', slot: 'weapon', rarity: 'common',
+    bonus: { attackMin: 2, attackMax: 2 },
+    price: 0,
+  },
   // 武器
   WOODEN_SWORD: {
     itemKey: 'WOODEN_SWORD', name: '木剑', slot: 'weapon', rarity: 'common',
@@ -130,6 +136,12 @@ export const EQUIPMENT_TYPES = {
     bonus: { maxHp: 40, maxMp: 30, healPower: 0.30 },
     uniqueEffect: 'healOverflow', price: 0,
     desc: '过量治疗转化为MP恢复',
+  },
+  MYSTIC_STICK: {
+    itemKey: 'MYSTIC_STICK', name: '看似普通的木棍', slot: 'weapon', rarity: 'legendary',
+    bonus: { attackMin: 999, attackMax: 999, strength: 99, agility: 99, critRateBonus: 1.0, lifesteal: 1.0 },
+    adminOnly: true, price: 0,
+    desc: '一根看起来毫不起眼的木棍，却蕴含着难以言喻的力量',
   },
 };
 

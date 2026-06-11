@@ -1,6 +1,6 @@
-# 极简回合制 RPG
+# Whispers of the Forgotten Realm
 
-一个用于学习游戏开发基础的单人回合制 RPG 网页游戏。
+一个单人回合制地牢爬行 RPG 网页游戏。
 纯前端项目，使用 React + Vite + TailwindCSS + Canvas。
 
 ## 快速开始

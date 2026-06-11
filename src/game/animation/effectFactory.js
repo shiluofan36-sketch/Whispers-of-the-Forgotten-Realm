@@ -83,18 +83,20 @@ export function createSkillEffect(state, skillKey, from, to) {
   const configs = SKILL_EFFECT_MAP[skillKey];
   if (!configs) return;
 
-  // 战斗中实体同格 → 用屏幕左侧/右侧位置替代
+  // 战斗中实体同格 → 用屏幕固定位置替代
+  // toPixel(g) = g * 72 + 36; x=2→180(玩家侧), x=7→540(怪物侧), y=4.5→360(屏幕垂直居中)
   let effFrom = { ...from };
   let effTo = { ...to };
   if (state.gamePhase === GAME_PHASE.BATTLE && from.x === to.x && from.y === to.y) {
     const isPlayerSkill = PLAYER_SKILLS.has(skillKey);
     const casterX = isPlayerSkill ? 2 : 7;
     const targetX = isPlayerSkill ? 7 : 2;
+    const centerY = 4.5;
     if (SELF_TARGET_SKILLS.has(skillKey)) {
-      effFrom = effTo = { x: casterX, y: 5 };
+      effFrom = effTo = { x: casterX, y: centerY };
     } else {
-      effFrom = { x: casterX, y: 5 };
-      effTo   = { x: targetX, y: 5 };
+      effFrom = { x: casterX, y: centerY };
+      effTo   = { x: targetX, y: centerY };
     }
   }
 

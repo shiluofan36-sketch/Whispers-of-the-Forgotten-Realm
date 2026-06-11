@@ -16,7 +16,8 @@
 
 import { getIconForItem, getIconForSlot, drawIcon } from '../renderer/iconRenderer';
 
-const DURATION = 1.5; // 1500ms
+const DURATION = 5.0; // 5000ms
+const FADE_OUT_DURATION = 0.4; // 淡出 400ms
 
 const QUALITY_COLORS = {
   common:    { color: '#9CA3AF', glow: null },
@@ -51,7 +52,20 @@ export function triggerLootCard(state, itemName, quality = 'common', itemKey = n
     duration: DURATION,
     scale: 0.8,
     opacity: 0,
+    fadingOut: false,
   };
+}
+
+/**
+ * 外部触发淡出（按键或点击时调用）
+ */
+export function dismissLootCard(state) {
+  if (!state.animation || !state.animation.lootCard) return;
+  const card = state.animation.lootCard;
+  if (!card.fadingOut) {
+    card.fadingOut = true;
+    card.fadeOutTimer = FADE_OUT_DURATION;
+  }
 }
 
 /**
@@ -60,10 +74,25 @@ export function triggerLootCard(state, itemName, quality = 'common', itemKey = n
 export function updateLootCard(state, dt) {
   if (!state.animation || !state.animation.lootCard) return;
   const card = state.animation.lootCard;
-  card.timer -= Math.min(dt, 0.1);
+  const cappedDt = Math.min(dt, 0.1);
 
+  // 淡出阶段
+  if (card.fadingOut) {
+    card.fadeOutTimer -= cappedDt;
+    card.opacity = Math.max(0, card.fadeOutTimer / FADE_OUT_DURATION);
+    if (card.fadeOutTimer <= 0) {
+      state.animation.lootCard = null;
+    }
+    return;
+  }
+
+  // 正常计时
+  card.timer -= cappedDt;
+
+  // 5秒到期 → 触发淡出
   if (card.timer <= 0) {
-    state.animation.lootCard = null;
+    card.fadingOut = true;
+    card.fadeOutTimer = FADE_OUT_DURATION;
     return;
   }
 
@@ -73,8 +102,8 @@ export function updateLootCard(state, dt) {
   const c3 = c1 + 1;
   card.scale = 1 + c3 * Math.pow(raw - 1, 3) + c1 * Math.pow(raw - 1, 2);
 
-  // opacity: fast fade in
-  card.opacity = Math.min(1, raw * 3);
+  // opacity: fast fade in first 20% of duration
+  card.opacity = Math.min(1, raw * 5);
 }
 
 /**
@@ -88,8 +117,8 @@ export function renderLootCard(ctx, state) {
   const canvasH = ctx.canvas.height;
   const cx = canvasW / 2;
   const cy = canvasH / 2;
-  const cardW = 160;
-  const cardH = 60;
+  const cardW = 240;
+  const cardH = 80;
 
   ctx.save();
   ctx.globalAlpha = card.opacity;
@@ -116,21 +145,24 @@ export function renderLootCard(ctx, state) {
   ctx.fillStyle = card.color;
   ctx.fillRect(-hw, -hh, cardW, 4);
 
-  // 图标（像素风）— 优先 itemKey，回退 slot，最后名称
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+
+  // 图标（像素风）
   let iconKey = getIconForItem(card.itemKey);
   if (iconKey === 'sword' && card.slot) {
     iconKey = getIconForSlot(card.slot);
   }
-  drawIcon(ctx, iconKey, card.quality, 0, -6, 24);
+  drawIcon(ctx, iconKey, card.quality, 0, -16, 28);
 
   // 装备名称
   ctx.fillStyle = '#ffffff';
-  ctx.font = 'bold 12px monospace';
-  ctx.fillText(card.itemName, 0, 16);
+  ctx.font = 'bold 16px monospace';
+  ctx.fillText(card.itemName, 0, 10);
 
   // 品质标签
   ctx.fillStyle = card.color;
-  ctx.font = '9px monospace';
+  ctx.font = 'bold 11px monospace';
   const qLabel = {
     common: '普通', rare: '稀有', epic: '史诗', legendary: '传说'
   }[card.quality] || card.quality;

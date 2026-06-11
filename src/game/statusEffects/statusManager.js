@@ -42,7 +42,7 @@ export function tickStatusEffects(state, entity, effects, isPlayer) {
       messages.push(`${config.label}造成${config.damagePerTurn}点伤害`);
 
       // 浮动文字 + 粒子
-      const pos = entityCenter(entity);
+      const pos = entityCenter(entity, state);
       addFloatingText(state, pos.px, pos.py, `-${config.damagePerTurn}`, eff.type);
 
       // 状态异常粒子映射

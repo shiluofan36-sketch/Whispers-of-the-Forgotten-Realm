@@ -1,6 +1,8 @@
-import { useState, lazy, Suspense } from 'react';
+import { useState, lazy, Suspense, useEffect } from 'react';
 import Divider from '../shared/Divider';
 import { getNpcInfo } from '../../game/npc/npcManager';
+import { hasWorldFlag } from '../../game/world/worldFlags';
+import KnowledgeTomePanel from './KnowledgeTomePanel';
 
 const ShopPanel = lazy(() => import('./ShopPanel'));
 const StoragePanel = lazy(() => import('./StoragePanel'));
@@ -19,6 +21,13 @@ export default function CampPanel({ state, onCampAction }) {
   const [view, setView] = useState('main');
   const [confirmDelete, setConfirmDelete] = useState(false);
   const { player, unlockedFloors, inventorySlots } = state;
+
+  // 教程步骤11：打开地下城之门视图时自动推进
+  useEffect(() => {
+    if (state.tutorialStep === 11 && view === 'floorSelect') {
+      onCampAction('tutorial_advance');
+    }
+  }, [view, state.tutorialStep]);
 
   return (
     <div className="space-y-3">
@@ -61,6 +70,21 @@ export default function CampPanel({ state, onCampAction }) {
       {/* 主菜单 */}
       {view === 'main' && (
         <div className="space-y-2">
+          {/* 教程营地引导对话框 */}
+          {state.pendingEvent && state.pendingEvent.isTutorial && (
+            <div className="bg-amber-900 border-2 border-amber-500 rounded p-3 space-y-2 mb-2">
+              <div className="text-amber-400 font-bold text-sm">{state.pendingEvent.name}</div>
+              <div className="text-gray-300 text-xs whitespace-pre-wrap">{state.pendingEvent.description}</div>
+              <div className="text-green-400 text-xs">奖励：{state.pendingEvent.reward}</div>
+              <button
+                onClick={() => onCampAction('event_accept')}
+                className="w-full py-1.5 bg-amber-700 hover:bg-amber-600 rounded text-xs font-bold text-white"
+              >
+                我知道了
+              </button>
+            </div>
+          )}
+
           <button
             onClick={() => setView('shop')}
             className="w-full py-2 rounded font-bold text-white bg-yellow-700 hover:bg-yellow-600 active:bg-yellow-800 transition-colors"
@@ -103,6 +127,18 @@ export default function CampPanel({ state, onCampAction }) {
           >
             [Meta] 营地升级
           </button>
+
+          <Divider />
+
+          {/* 知识宝典（教程完成后显示） */}
+          {hasWorldFlag(state, 'tutorialCompleted') && (
+            <button
+              onClick={() => setView('knowledgeTome')}
+              className="w-full py-2 rounded font-bold text-white bg-cyan-700 hover:bg-cyan-600 active:bg-cyan-800 transition-colors"
+            >
+              [?] 知识宝典
+            </button>
+          )}
 
           <Divider />
 
@@ -174,6 +210,9 @@ export default function CampPanel({ state, onCampAction }) {
 
       {/* Meta 升级子面板 */}
       {view === 'meta' && <div className="animate-fade-in"><LazyLoad><MetaPanel state={state} onCampAction={onCampAction} onBack={() => setView('main')} /></LazyLoad></div>}
+
+      {/* 知识宝典子面板 */}
+      {view === 'knowledgeTome' && <div className="animate-fade-in"><KnowledgeTomePanel onBack={() => setView('main')} /></div>}
 
       {/* NPC 对话子面板 */}
       {view.startsWith('npc_') && <NpcTalkView npcId={view.replace('npc_', '')} state={state} onCampAction={onCampAction} onBack={() => setView('main')} />}

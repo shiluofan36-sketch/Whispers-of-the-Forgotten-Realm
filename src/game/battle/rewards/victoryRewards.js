@@ -3,6 +3,7 @@ import { generateMonster } from '../../monsters';
 import { scaleMonsterForFloor } from '../../dungeon/difficultyScaling';
 import { onMonsterKilled } from '../../dungeon/floorProgression';
 import { unlockNextFloor } from '../../expedition/expeditionManager';
+import { advanceTutorialStep } from '../../tutorial/tutorialManager';
 
 export function handleBossVictory(state, monster) {
   state.bossDefeated = true;
@@ -17,6 +18,13 @@ export function handlePostBattleRecovery(state) {
   const mpRestore = Math.min(MP_RESTORE, state.player.maxMp - state.player.mp);
   state.player.mp += mpRestore;
   state.battleLog.push(`战斗胜利！恢复了${heal}HP, ${mpRestore}MP`);
+
+  // 教程模式：不生成新怪物，改为推进教程步骤
+  if (state.isTutorialFloor) {
+    state.monster = null;
+    advanceTutorialStep(state);
+    return;
+  }
 
   const floorConfig = FLOORS[state.currentFloor];
   const pool = floorConfig.monsterPool || null;

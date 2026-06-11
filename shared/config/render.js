@@ -1,6 +1,6 @@
 // 渲染常量（唯一配置源：shared/config/render.js）
 export const GRID_SIZE = 10;
-export const CELL_SIZE = 48;
+export const CELL_SIZE = 72;
 
 export const OBSTACLE_COUNT = 6;
 export const OBSTACLE_GEN_MAX_ATTEMPTS = 100;
@@ -57,13 +57,13 @@ export const STAIRS_LABEL = '>';
 export const STAIRS_LOCKED_LABEL = 'X';
 
 export const OBSTACLE_THEME = {
-  forest:    { rock: '#888888', tree: '#228833' },
-  cave:      { rock: '#777799', tree: '#887744' },
-  ruins:     { rock: '#998866', tree: '#665544' },
-  lava:      { rock: '#444444', tree: '#cc4400', bg: '#3a1010', grid: '#4a1a1a' },
-  graveyard: { rock: '#666677', tree: '#445544', bg: '#1a1a1e', grid: '#2a2a3a' },
-  ice:       { rock: '#aabbdd', tree: '#ccddff', bg: '#1a2a3a', grid: '#2a3a4a' },
-  void:      { rock: '#331144', tree: '#221133', bg: '#0a0a14', grid: '#1a1a2a' },
+  forest:    { rock: '#7a8a6a', tree: '#2a6a2a' },
+  cave:      { rock: '#5a5a6a', tree: '#4a6a8a' },
+  ruins:     { rock: '#9a8a6a', tree: '#5a4a3a' },
+  lava:      { rock: '#3a1a1a', tree: '#3a1515', bg: '#3a1010', grid: '#4a1a1a' },
+  graveyard: { rock: '#7a7a7a', tree: '#3a3a3a', bg: '#1a1a1e', grid: '#2a2a3a' },
+  ice:       { rock: '#9abacc', tree: '#8abacc', bg: '#1a2a3a', grid: '#2a3a4a' },
+  void:      { rock: '#4a3a5a', tree: '#3a2a4a', bg: '#0a0a14', grid: '#1a1a2a' },
 };
 
 export const THEME_BG = {

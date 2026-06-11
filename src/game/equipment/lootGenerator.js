@@ -7,11 +7,11 @@ export function generateEquipment(floor, rarity, forceType) {
   let pool;
   if (forceType) {
     pool = Object.entries(EQUIPMENT_TYPES).filter(
-      ([, eq]) => eq.rarity === rarity && !eq.bossDrop && eq.slot === forceType
+      ([, eq]) => eq.rarity === rarity && !eq.bossDrop && !eq.adminOnly && eq.slot === forceType
     );
   } else {
     pool = Object.entries(EQUIPMENT_TYPES).filter(
-      ([, eq]) => eq.rarity === rarity && !eq.bossDrop
+      ([, eq]) => eq.rarity === rarity && !eq.bossDrop && !eq.adminOnly
     );
   }
 

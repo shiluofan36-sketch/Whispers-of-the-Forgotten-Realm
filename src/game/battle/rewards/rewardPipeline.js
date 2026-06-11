@@ -30,8 +30,8 @@ export function runRewardPipeline(state) {
   // 掉落（道具+装备）
   grantLootRewards(state, monster);
 
-  // 随机事件（非Boss）
-  if (!monster.bossKey) {
+  // 随机事件（非Boss，教程期间跳过）
+  if (!monster.bossKey && !state.isTutorialFloor) {
     tryTriggerEvent(state);
   }
 
@@ -47,8 +47,10 @@ export function runRewardPipeline(state) {
     return true;
   }
 
-  // 清层计数
-  onMonsterKilled(state);
+  // 清层计数（教程模式跳过 -- 由 handlePostBattleRecovery 接管）
+  if (!state.isTutorialFloor) {
+    onMonsterKilled(state);
+  }
 
   // Phase 13: 死亡动画 — 延迟切换阶段
   state.monster.pendingDeath = true;

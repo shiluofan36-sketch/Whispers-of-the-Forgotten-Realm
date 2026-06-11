@@ -42,7 +42,7 @@ export function playerAttack(state) {
   if (isCrit) triggerCritHitStop(state);
 
   // 浮动文字 + 受击闪烁 + 音效
-  const pos = entityCenter(monster);
+  const pos = entityCenter(monster, state);
   if (wasDefending) {
     addFloatingText(state, pos.px, pos.py, 'BLOCK', 'block');
     playSfx('block');
@@ -72,7 +72,7 @@ export function playerAttack(state) {
   if (monster.isElite && monster.eliteModifier?.thorns) {
     const reflect = monster.eliteModifier.thorns;
     player.hp = Math.max(0, player.hp - reflect);
-    const playerPos = entityCenter(player);
+    const playerPos = entityCenter(player, state);
     addFloatingText(state, playerPos.px, playerPos.py, `-${reflect}`, 'damage');
     state.battleLog.push(`${monster.name}的荆棘光环反弹${reflect}伤害！`);
   }
@@ -100,7 +100,7 @@ export function playerHeal(state) {
   const actualHeal = Math.min(baseHeal, player.maxHp - player.hp);
   player.hp += actualHeal;
 
-  const pos = entityCenter(player);
+  const pos = entityCenter(player, state);
   addFloatingText(state, pos.px, pos.py, `+${actualHeal}`, 'heal');
   playSfx('heal');
 
@@ -131,7 +131,7 @@ export function playerUseSkill(state, skillKey) {
     if (isCrit) triggerCritHitStop(state);
     createSkillEffect(state, skillKey, { x: player.x, y: player.y }, { x: monster.x, y: monster.y });
 
-    const pos = entityCenter(monster);
+    const pos = entityCenter(monster, state);
     if (isCrit) {
       addFloatingText(state, pos.px, pos.py, `-${finalDmg}`, 'crit');
       addFloatingText(state, pos.px, pos.py - 20, 'CRIT!', 'crit');
@@ -159,7 +159,7 @@ export function playerUseSkill(state, skillKey) {
       if (isCrit) triggerCritHitStop(state);
       createSkillEffect(state, skillKey, { x: player.x, y: player.y }, { x: monster.x, y: monster.y });
 
-      const pos = entityCenter(monster);
+      const pos = entityCenter(monster, state);
       if (isCrit) {
         addFloatingText(state, pos.px, pos.py, `-${damage}`, 'crit');
         addFloatingText(state, pos.px, pos.py - 20, 'CRIT!', 'crit');
@@ -175,7 +175,7 @@ export function playerUseSkill(state, skillKey) {
     const actualHeal = Math.min(healAmount, player.maxHp - player.hp);
     player.hp += actualHeal;
 
-    const playerPos = entityCenter(player);
+    const playerPos = entityCenter(player, state);
     addFloatingText(state, playerPos.px, playerPos.py, `+${actualHeal}`, 'heal');
 
     if (hitMinion) {
@@ -197,7 +197,7 @@ export function playerUseSkill(state, skillKey) {
     if (isCrit) triggerCritHitStop(state);
     createSkillEffect(state, skillKey, { x: player.x, y: player.y }, { x: monster.x, y: monster.y });
 
-    const pos = entityCenter(monster);
+    const pos = entityCenter(monster, state);
     addFloatingText(state, pos.px, pos.py, `-${finalDmg}`, 'damage');
     triggerEntityFlash(monster, !!monster.bossKey);
     playHitReaction(monster, !!monster.bossKey);
@@ -244,7 +244,7 @@ function applyPlayerOnHitEffects(state, damageDealt) {
     if (healAmount > 0) {
       const actualHeal = Math.min(healAmount, player.maxHp - player.hp);
       player.hp += actualHeal;
-      const pos = entityCenter(player);
+      const pos = entityCenter(player, state);
       addFloatingText(state, pos.px, pos.py, `+${actualHeal}`, 'heal');
       state.battleLog.push(`吸血恢复 ${actualHeal} HP`);
     }

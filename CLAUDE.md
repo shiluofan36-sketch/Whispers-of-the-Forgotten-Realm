@@ -2,10 +2,10 @@
 
 ## 项目概述
 
-这是一个**学习用极简回合制地牢爬行 RPG 网页游戏**，纯前端项目。
+这是 **Whispers of the Forgotten Realm**，一个回合制地牢爬行 RPG 网页游戏。
 目标是"先完成最小可运行版本（MVP）"，不追求复杂和炫酷。
 
-- **类型**：单人回合制网格地图地牢 RPG
+- **类型**：单人回合制网格地图地牢 RPG — Whispers of the Forgotten Realm
 - **渲染**：HTML5 Canvas 纯渲染（非 DOM/React 网格）
 - **状态**：数据驱动、可变状态对象
 - **阶段**：已完成 Phase 1~11（含 Node 服务层/特殊房间/NPC/Meta升级/世界观碎片），~90 个源文件，中大型项目规模

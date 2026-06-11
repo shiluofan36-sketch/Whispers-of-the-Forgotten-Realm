@@ -18,6 +18,8 @@ export const FLAGS = {
   // 特殊
   LORE_HALF_COLLECTED: 'loreHalfCollected',
   ALL_LORE_COLLECTED: 'allLoreCollected',
+  // 教程
+  TUTORIAL_COMPLETED: 'tutorialCompleted',
 };
 
 export function setWorldFlag(state, flag) {

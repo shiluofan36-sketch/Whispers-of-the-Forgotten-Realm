@@ -2,7 +2,7 @@
 
 ## 一、整体视觉方向
 
-**暗黑像素风 RPG** — Dark Fantasy + Pixel Art + Roguelike + Dungeon Crawler
+**Whispers of the Forgotten Realm** — Dark Fantasy + Pixel Art + Roguelike + Dungeon Crawler
 
 视觉参考：Darkest Dungeon / Slay the Spire / Loop Hero / The Binding of Isaac
 

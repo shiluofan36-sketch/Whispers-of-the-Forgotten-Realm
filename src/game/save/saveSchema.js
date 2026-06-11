@@ -43,6 +43,7 @@ export function getSaveData(state) {
     loreHistory: state.loreHistory,
     worldFlags: state.worldFlags,
     ascensionLevel: state.ascensionLevel || 0,
+    tutorialStep: state.tutorialStep,
   };
 }
 
@@ -83,6 +84,7 @@ export function applySaveData(state, saveData) {
   if (saveData.loreHistory != null) state.loreHistory = saveData.loreHistory;
   if (saveData.worldFlags != null) state.worldFlags = saveData.worldFlags;
   if (saveData.ascensionLevel != null) state.ascensionLevel = saveData.ascensionLevel;
+  if (saveData.tutorialStep != null) state.tutorialStep = saveData.tutorialStep;
 
   return true;
 }

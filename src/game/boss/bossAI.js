@@ -4,19 +4,28 @@ import { summonerBossAct, minionAct } from './bossSummonSystem';
 import { applyMonsterDamage } from '../battle/damageSystem';
 import { addFloatingText, entityCenter } from '../effects/floatingTextManager';
 import { triggerPlayerFlash } from '../effects/entityFlash';
+import { executeTutorialBossAction, resetTutorialBossState } from '../tutorial/tutorialBossAI';
+
+// 从boss对象或BOSS_TYPES获取配置
+function getBossConfig(boss) {
+  return boss.config || (BOSS_TYPES[boss.bossKey] || null);
+}
 
 /**
  * Boss AI 总入口：根据Boss行为类型分发
  */
 export function executeBossAction(state) {
   const boss = state.monster;
-  const config = BOSS_TYPES[boss.bossKey];
+  const config = getBossConfig(boss);
 
   // 狂暴检查（行动前）
   checkBossEnrage(state);
 
   // 根据行为类型分发
   switch (config.behavior) {
+    case 'tutorial':
+      executeTutorialBossAction(state);
+      break;
     case 'caster':
       casterBossAct(state, config);
       break;
@@ -108,7 +117,7 @@ function weakenedAttack(state) {
   const noteStr = notes.length > 0 ? `（${notes.join('，')}）` : '';
   state.battleLog.push(`${monster.name}(虚弱)对你造成${damage}点伤害${noteStr}`);
 
-  const pos = entityCenter(state.player);
+  const pos = entityCenter(state.player, state);
   addFloatingText(state, pos.px, pos.py, `-${damage}`, 'damage');
   triggerPlayerFlash(state.player);
 }

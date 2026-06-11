@@ -137,7 +137,7 @@ export function getBossEquipment(bossKey) {
 
 export function getRandomEquipment() {
   const nonBoss = Object.keys(EQUIPMENT_TYPES).filter(
-    k => !EQUIPMENT_TYPES[k].bossDrop
+    k => !EQUIPMENT_TYPES[k].bossDrop && !EQUIPMENT_TYPES[k].adminOnly
   );
   if (nonBoss.length === 0) return null;
   return nonBoss[Math.floor(Math.random() * nonBoss.length)];

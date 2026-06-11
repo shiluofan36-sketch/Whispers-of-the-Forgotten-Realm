@@ -16,6 +16,7 @@
 
 import { GAME_PHASE } from '../constants';
 import { handleBossVictory, handlePostBattleRecovery } from '../battle/rewards/victoryRewards';
+import { directionFromDelta } from '../renderer/spriteDirections';
 
 // 动画默认时长（秒）
 export const ANIM = {
@@ -24,6 +25,7 @@ export const ANIM = {
   BOSS_HIT_REACT_DURATION: 0.18,
   DEATH_DURATION: 0.25,
   ENRAGE_DURATION: 1.0,
+  WALK_DURATION: 0.18,
 };
 
 /**
@@ -139,6 +141,28 @@ export function playEnrageAnim(entity) {
 }
 
 /**
+ * 移动动画：上下微弹 + 设置朝向
+ * @param {object} entity
+ * @param {number} dx - X 方向 (-1/0/1)
+ * @param {number} dy - Y 方向 (-1/0/1)
+ */
+export function playWalkAnim(entity, dx, dy) {
+  entity.facing = directionFromDelta(dx, dy);
+  entity.animState = {
+    type: 'walk',
+    timer: ANIM.WALK_DURATION,
+    duration: ANIM.WALK_DURATION,
+    dirX: dx,
+    dirY: dy,
+    distance: 4,
+    offsetX: 0,
+    offsetY: 0,
+    scale: 1,
+    opacity: 1,
+  };
+}
+
+/**
  * 每帧更新单个实体的动画状态
  * 由 updateAnimationState 调用
  */
@@ -163,6 +187,14 @@ export function updateEntityAnim(entity, dt) {
   const raw = Math.max(0, anim.timer / anim.duration); // 1→0
 
   switch (anim.type) {
+    case 'walk': {
+      const bounce = Math.sin(raw * Math.PI * 2) * 3;
+      anim.offsetY = bounce;
+      anim.offsetX = anim.dirX * 2 * (1 - Math.abs(raw - 0.5) * 2);
+      anim.scale = 1;
+      anim.opacity = 1;
+      break;
+    }
     case 'lunge': {
       // 前半段前冲，后半段弹回
       const phase = raw > 0.5 ? (1 - raw) * 2 : raw * 2;

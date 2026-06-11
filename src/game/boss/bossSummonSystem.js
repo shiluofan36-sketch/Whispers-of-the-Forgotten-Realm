@@ -77,6 +77,7 @@ function summonMinion(state, typeKey) {
     exp: 0, // 小兵不提供经验
     isMinion: true,
     flashTimer: 0,
+    facing: 'left', // 战斗中面朝玩家（左侧）
   };
 
   state.bossMinions.push(minion);
@@ -102,7 +103,7 @@ export function minionAct(state) {
     ) + minion.attackMin;
     const { damage, notes } = applyMonsterDamage(state, baseDmg);
 
-    const pos = entityCenter(state.player);
+    const pos = entityCenter(state.player, state);
     addFloatingText(state, pos.px, pos.py, `-${damage}`, 'damage');
     triggerPlayerFlash(state.player);
     playSfx('attack');

@@ -18,7 +18,7 @@ export default function GameUI({ state, onBattleAction, onUseItem, onSkill, onCa
   return (
     <div className="w-80 ml-4 space-y-3 text-sm">
       <h1 className="text-lg font-bold text-green-400 border-b-2 border-gray-700 pb-2 font-pixel tracking-tight">
-        RPG
+        WotFR
       </h1>
 
       {gamePhase === GAME_PHASE.CAMP && (
@@ -29,7 +29,7 @@ export default function GameUI({ state, onBattleAction, onUseItem, onSkill, onCa
       )}
       {gamePhase === GAME_PHASE.BATTLE && (
         <Suspense fallback={<LoadingFallback />}>
-          <div className="animate-fade-in"><BattlePanel state={state} onAction={onBattleAction} onUseItem={onUseItem} onSkill={onSkill} /></div>
+          <div className="animate-fade-in"><BattlePanel state={state} onAction={onBattleAction} onUseItem={onUseItem} onSkill={onSkill} onCampAction={onCampAction} /></div>
         </Suspense>
       )}
       {gamePhase === GAME_PHASE.GAME_OVER && (
