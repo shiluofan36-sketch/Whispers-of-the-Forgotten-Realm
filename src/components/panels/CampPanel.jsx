@@ -1,4 +1,4 @@
-import { useState, lazy, Suspense, useEffect } from 'react';
+import { useState, lazy, Suspense, useEffect, useRef } from 'react';
 import Divider from '../shared/Divider';
 import { getNpcInfo } from '../../game/npc/npcManager';
 import { hasWorldFlag } from '../../game/world/worldFlags';
@@ -22,12 +22,14 @@ export default function CampPanel({ state, onCampAction }) {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const { player, unlockedFloors, inventorySlots } = state;
 
-  // 教程步骤11：打开地下城之门视图时自动推进
+  // 教程步骤11：打开地下城之门视图时自动推进（避免 StrictMode 重复触发）
+  const tutorial11Advanced = useRef(false);
   useEffect(() => {
-    if (state.tutorialStep === 11 && view === 'floorSelect') {
+    if (state.tutorialStep === 11 && view === 'floorSelect' && !tutorial11Advanced.current) {
+      tutorial11Advanced.current = true;
       onCampAction('tutorial_advance');
     }
-  }, [view, state.tutorialStep]);
+  }, [view, state.tutorialStep, onCampAction]);
 
   return (
     <div className="space-y-3">

@@ -33,6 +33,7 @@ export function getSaveData(state) {
       equipment: state.player.equipment,
     },
     inventorySlots: state.inventorySlots,
+    inventory: state.inventory, // backpack items (persisted across reloads)
     storage: state.storage,
     unlockedFloors: state.unlockedFloors,
     monstersDefeated: state.monstersDefeated,
@@ -74,6 +75,7 @@ export function applySaveData(state, saveData) {
   }
 
   if (saveData.inventorySlots != null) state.inventorySlots = saveData.inventorySlots;
+  if (saveData.inventory != null) state.inventory = saveData.inventory;
   if (saveData.storage != null) state.storage = saveData.storage;
   if (saveData.unlockedFloors != null) state.unlockedFloors = saveData.unlockedFloors;
   if (saveData.monstersDefeated != null) state.monstersDefeated = saveData.monstersDefeated;

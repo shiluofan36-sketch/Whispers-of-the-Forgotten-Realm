@@ -16,7 +16,10 @@ export function restAtCampfire(state) {
   player.hp = player.maxHp;
   player.mp = player.maxMp;
 
-  state.battleLog.push(`在营火旁休息，恢复了${hpHealed} HP, ${mpHealed} MP`);
+  // 仅在实际恢复时才输出日志
+  if (hpHealed > 0 || mpHealed > 0) {
+    state.battleLog.push(`在营火旁休息，恢复了${hpHealed} HP, ${mpHealed} MP`);
+  }
   autoSave(state, 'return_camp');
 }
 

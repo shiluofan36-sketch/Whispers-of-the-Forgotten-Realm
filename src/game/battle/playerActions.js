@@ -112,20 +112,31 @@ export function playerHeal(state) {
  */
 export function playerUseSkill(state, skillKey) {
   const skill = SKILLS[skillKey];
+  if (!skill) {
+    state.battleLog.push('未知技能！');
+    return;
+  }
   const { player, monster } = state;
 
-  player.mp -= skill.mp;
-  state.battleLog.push(`使用【${skill.name}】(消耗 ${skill.mp} MP)`);
-
   if (skillKey === 'HEAVY_STRIKE') {
-    playAttackLunge(player, monster.x, monster.y);
-    const { damage, isCrit } = calcPlayerDamage(player, monster);
-    const finalDmg = Math.floor(damage * skill.multiplier);
+    // 先计算伤害（不扣 MP，小兵拦截后回退 MP）
+    const atkBuff = consumeAttackBuff(player);
+    if (atkBuff > 0) {
+      state.battleLog.push(`攻击卷轴生效！+${atkBuff}额外伤害`);
+    }
+    let totalDmg = Math.floor(calcPlayerDamage(player, monster).damage * skill.multiplier) + atkBuff;
 
-    if (monster.bossKey && applyDamageToMinions(state, finalDmg)) {
+    // Boss战时先检查小兵干扰
+    if (monster.bossKey && applyDamageToMinions(state, totalDmg)) {
       return;
     }
 
+    // 小兵拦截通过后，再扣 MP
+    player.mp -= skill.mp;
+    state.battleLog.push(`使用【${skill.name}】(消耗 ${skill.mp} MP)`);
+    playAttackLunge(player, monster.x, monster.y);
+    const { damage, isCrit } = calcPlayerDamage(player, monster);
+    const finalDmg = Math.floor(damage * skill.multiplier) + atkBuff;
     monster.hp = Math.max(0, monster.hp - finalDmg);
 
     if (isCrit) triggerCritHitStop(state);
@@ -148,28 +159,30 @@ export function playerUseSkill(state, skillKey) {
   }
 
   if (skillKey === 'DRAIN') {
-    playAttackLunge(player, monster.x, monster.y);
+    // 先计算伤害，小兵拦截返回（不扣 MP）
     const { damage, isCrit } = calcPlayerDamage(player, monster);
-
     const hitMinion = monster.bossKey && applyDamageToMinions(state, damage);
+    if (hitMinion) return;
 
-    if (!hitMinion) {
-      monster.hp = Math.max(0, monster.hp - damage);
+    // 小兵拦截通过后，再扣 MP
+    player.mp -= skill.mp;
+    state.battleLog.push(`使用【${skill.name}】(消耗 ${skill.mp} MP)`);
+    playAttackLunge(player, monster.x, monster.y);
+    monster.hp = Math.max(0, monster.hp - damage);
 
-      if (isCrit) triggerCritHitStop(state);
-      createSkillEffect(state, skillKey, { x: player.x, y: player.y }, { x: monster.x, y: monster.y });
+    if (isCrit) triggerCritHitStop(state);
+    createSkillEffect(state, skillKey, { x: player.x, y: player.y }, { x: monster.x, y: monster.y });
 
-      const pos = entityCenter(monster, state);
-      if (isCrit) {
-        addFloatingText(state, pos.px, pos.py, `-${damage}`, 'crit');
-        addFloatingText(state, pos.px, pos.py - 20, 'CRIT!', 'crit');
-        if (state.particles) state.particles.emit('crit', pos.px, pos.py);
-      } else {
-        addFloatingText(state, pos.px, pos.py, `-${damage}`, 'damage');
-      }
-      triggerEntityFlash(monster, !!monster.bossKey);
-      playHitReaction(monster, !!monster.bossKey);
+    const pos = entityCenter(monster, state);
+    if (isCrit) {
+      addFloatingText(state, pos.px, pos.py, `-${damage}`, 'crit');
+      addFloatingText(state, pos.px, pos.py - 20, 'CRIT!', 'crit');
+      if (state.particles) state.particles.emit('crit', pos.px, pos.py);
+    } else {
+      addFloatingText(state, pos.px, pos.py, `-${damage}`, 'damage');
     }
+    triggerEntityFlash(monster, !!monster.bossKey);
+    playHitReaction(monster, !!monster.bossKey);
 
     const healAmount = Math.floor(damage * skill.drainRate);
     const actualHeal = Math.min(healAmount, player.maxHp - player.hp);
@@ -178,9 +191,7 @@ export function playerUseSkill(state, skillKey) {
     const playerPos = entityCenter(player, state);
     addFloatingText(state, playerPos.px, playerPos.py, `+${actualHeal}`, 'heal');
 
-    if (hitMinion) {
-      state.battleLog.push(`吸血恢复${actualHeal} HP`);
-    } else if (isCrit) {
+    if (isCrit) {
       state.battleLog.push(`CRITICAL HIT! 对${monster.name}造成${damage}点伤害，恢复${actualHeal} HP`);
     } else {
       state.battleLog.push(`对${monster.name}造成${damage}点伤害，恢复${actualHeal} HP`);

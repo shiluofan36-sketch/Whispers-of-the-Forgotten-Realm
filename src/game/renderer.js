@@ -58,7 +58,7 @@ export function render(ctx, state) {
     const m = state.tutorialMarker;
     const cx = m.x * CELL_SIZE + CELL_SIZE / 2;
     const cy = m.y * CELL_SIZE + CELL_SIZE / 2;
-    const pulse = 0.5 + 0.5 * Math.sin(Date.now() / 400);
+    const pulse = 0.5 + 0.5 * Math.sin((state.animation?.idlePhase || 0) / 0.4);
     const radius = CELL_SIZE * 0.35 + pulse * CELL_SIZE * 0.1;
     ctx.save();
     ctx.beginPath();

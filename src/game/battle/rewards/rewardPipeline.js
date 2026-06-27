@@ -38,6 +38,11 @@ export function runRewardPipeline(state) {
   // EXP
   addExp(state, monster.exp);
 
+  // Phase 15: 遗物击杀效果（如瘟疫之种）
+  if (state.currentRelic?.onKill) {
+    state.currentRelic.onKill(state);
+  }
+
   // 清除战斗buff
   clearBuffs(state);
 
@@ -58,6 +63,7 @@ export function runRewardPipeline(state) {
   playDeathAnim(state.monster);
 
   // 保持战斗阶段直到死亡动画结束（updateEffects 中处理）
+  // 防止在此期间调用 startExpedition 导致状态竞争
   state.gamePhase = GAME_PHASE.BATTLE;
 
   return true;

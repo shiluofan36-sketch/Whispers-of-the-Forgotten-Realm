@@ -11,7 +11,7 @@ export function calcPlayerDamage(player, monster) {
   let baseDmg = randomInt(player.attackMin, player.attackMax);
   baseDmg += player.strength;
 
-  const critRate = BASE_CRIT + player.agility * AGI_CRIT + (player.critRateBonus || 0);
+  const critRate = Math.min(BASE_CRIT + player.agility * AGI_CRIT + (player.critRateBonus || 0), 1.0);
   const isCrit = Math.random() < critRate;
   const critMult = CRIT_MULT + (player.critDamageBonus || 0);
   let total = isCrit ? Math.floor(baseDmg * critMult) : baseDmg;

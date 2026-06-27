@@ -13,6 +13,9 @@ export function handleBossVictory(state, monster) {
 }
 
 export function handlePostBattleRecovery(state) {
+  // 重置防御姿态（避免上一场战斗的防御状态残留到新战斗）
+  state.player.isDefending = false;
+
   const heal = Math.min(POST_BATTLE_HEAL, state.player.maxHp - state.player.hp);
   state.player.hp += heal;
   const mpRestore = Math.min(MP_RESTORE, state.player.maxMp - state.player.mp);

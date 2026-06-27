@@ -1,5 +1,5 @@
 // 瓦片渲染器：程序化生成 → 离屏Canvas缓存 → 绘制
-import { CELL_SIZE, BIOME_PALETTES } from '../constants';
+import { CELL_SIZE, GRID_SIZE, BIOME_PALETTES } from '../constants';
 import { FLOOR_GENERATORS, OBSTACLE_GENERATORS, genWall, genStairs } from './tileGenerator';
 
 const tileCache = new Map();
@@ -75,8 +75,8 @@ export function drawTileBackground(ctx, biome) {
   if (!variants || variants.length === 0) return;
 
   // 用简单的确定性哈希每格选一个变体
-  for (let row = 0; row < 10; row++) {
-    for (let col = 0; col < 10; col++) {
+  for (let row = 0; row < GRID_SIZE; row++) {
+    for (let col = 0; col < GRID_SIZE; col++) {
       const hash = (row * 31 + col * 17) % variants.length;
       const canvas = variants[hash].canvas;
       if (canvas) {
@@ -95,8 +95,8 @@ export function drawTileGrid(ctx, biome) {
   ctx.strokeStyle = gridColor;
   ctx.lineWidth = 1;
   ctx.globalAlpha = 0.25;
-  const size = 10 * CELL_SIZE;
-  for (let i = 0; i <= 10; i++) {
+  const size = GRID_SIZE * CELL_SIZE;
+  for (let i = 0; i <= GRID_SIZE; i++) {
     const pos = i * CELL_SIZE;
     ctx.beginPath(); ctx.moveTo(pos, 0); ctx.lineTo(pos, size); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(0, pos); ctx.lineTo(size, pos); ctx.stroke();

@@ -5,9 +5,9 @@ export const META_UPGRADES = {
     name: '仓库扩展',
     levels: [
       { level: 0, cost: 0,    effect: '基础存储', bonus: 0 },
-      { level: 1, cost: 200,  effect: '快速存取槽 +5', bonus: 5 },
-      { level: 2, cost: 500,  effect: '快速存取槽 +10', bonus: 10 },
-      { level: 3, cost: 1000, effect: '快速存取槽 +20', bonus: 20 },
+      { level: 1, cost: 200,  effect: '背包容量 +5', bonus: 5 },
+      { level: 2, cost: 500,  effect: '背包容量 +5', bonus: 5 },
+      { level: 3, cost: 1000, effect: '背包容量 +10', bonus: 10 },
     ],
     maxLevel: 3,
   },

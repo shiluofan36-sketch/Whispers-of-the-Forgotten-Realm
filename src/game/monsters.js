@@ -1,4 +1,4 @@
-import { MONSTER_TYPES, ELITE_MODIFIERS, ELITE_CHANCE, GRID_SIZE } from './constants';
+import { MONSTER_TYPES, ELITE_MODIFIERS, ELITE_CHANCE, GRID_SIZE, GAME_PHASE } from './constants';
 import { findEmptyCell, isObstacle, isInBounds } from './map';
 import { initAnimState, playWalkAnim } from './animation/animationManager';
 
@@ -83,7 +83,7 @@ function applyEliteModifier(monster) {
  */
 export function moveMonster(state) {
   if (!state.monster) return false;
-  if (state.gamePhase !== 'exploration') return false;
+  if (state.gamePhase !== GAME_PHASE.EXPLORATION) return false;
   if (Math.random() > MONSTER_MOVE_CHANCE) return false;
 
   const { monster, player, obstacles, stairs, room } = state;

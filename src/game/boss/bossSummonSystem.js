@@ -1,7 +1,7 @@
 import { MONSTER_TYPES } from '../constants';
 import { applyMonsterDamage } from '../battle/damageSystem';
 import { addFloatingText, entityCenter } from '../effects/floatingTextManager';
-import { triggerPlayerFlash } from '../effects/entityFlash';
+import { triggerPlayerFlash, triggerEntityFlash } from '../effects/entityFlash';
 import { playSfx } from '../audio/audioManager';
 
 /**
@@ -36,6 +36,8 @@ export function summonerBossAct(state, config) {
 
   // 冷却完毕且小兵未满
   if (boss.summonCooldown <= 0) {
+    // 先清理已死亡的小兵
+    state.bossMinions = (state.bossMinions || []).filter(m => m.hp > 0);
     const minions = state.bossMinions || [];
     const maxMinions = config.summonMax || 2;
 
@@ -125,8 +127,20 @@ export function applyDamageToMinions(state, damage) {
   if (Math.random() < 0.3) {
     const target = alive[Math.floor(Math.random() * alive.length)];
     target.hp = Math.max(0, target.hp - damage);
+    const wasDestroyed = target.hp <= 0;
+
+    // 飘字反馈
+    const pos = entityCenter(target, state);
+    addFloatingText(state, pos.px, pos.py, `命中${target.name}！`, 'info');
+
+    // 受击闪烁
+    triggerEntityFlash(target, false);
+
+    // 攻击音效
+    playSfx('attack');
+
     state.battleLog.push(`攻击命中${target.name}！造成${damage}点伤害`);
-    if (target.hp <= 0) {
+    if (wasDestroyed) {
       state.battleLog.push(`${target.name}被消灭！`);
     }
     return true;

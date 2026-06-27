@@ -40,7 +40,7 @@ export function checkAchievements(state, event) {
         unlocked = event.type === 'floor_unlock' && state.unlockedFloors >= 12;
         break;
       case 'GOLD_HOARDER':
-        unlocked = event.type === 'gold_gain' && state.player.gold >= 500;
+        unlocked = event.type === 'gold_gain' && (state.player.gold + state.expeditionGold) >= 500;
         break;
       case 'FLOOR_MASTER':
         unlocked = event.type === 'floor_unlock' && state.unlockedFloors >= 8;

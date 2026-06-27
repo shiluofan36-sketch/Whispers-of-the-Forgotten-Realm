@@ -17,7 +17,7 @@ export function applyRelic(state, relic) {
 export function removeRelic(state) {
   const relic = state.currentRelic;
   if (!relic) return;
-  // Relics effects are reverted by expedition end (stats reset by meta revert)
+  if (relic.remove) relic.remove(state);
   state.currentRelic = null;
 }
 

@@ -50,6 +50,9 @@ export function applyMetaBonuses(state) {
 
 // Revert meta bonuses when returning to camp
 export function revertMetaBonuses(state) {
+  // Guard against double revert (no active meta bonuses = no-op)
+  if ((state.metaProgress.adventurerHall || 0) === 0 && (state.metaProgress.storage || 0) === 0) return;
+
   const hall = state.metaProgress.adventurerHall || 0;
   if (hall >= 1) state.player.maxHp -= 10;
   if (hall >= 2) {

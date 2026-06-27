@@ -57,6 +57,7 @@ export function returnToCamp(state) {
   state.floorCleared = false;
   state.battleLog = [];
   state.player.isDefending = false;
+  state.statusEffects = [];
 
   state.gamePhase = GAME_PHASE.CAMP;
   state.selectedFloor = null;
@@ -93,6 +94,7 @@ export function handleDeath(state) {
   state.player.attackBuff = 0;
   state.player.defenseBuff = 0;
   state.player.shieldTurns = 0;
+  state.statusEffects = [];
 
   state.gamePhase = GAME_PHASE.CAMP;
   state.selectedFloor = null;
@@ -100,7 +102,7 @@ export function handleDeath(state) {
   revertMetaBonuses(state);
   removeRelic(state);
 
-  autoSave(state, 'return_camp');
+  autoSave(state, 'death');
 }
 
 /**

@@ -5,7 +5,7 @@ import { grantBattleRewards, grantBattleDefeat } from './battleRewards';
 import { executeBossAction } from '../boss/bossAI';
 import { tickStatusEffects, checkFreezeBlock, triggerBleedOnAction } from '../statusEffects/statusManager';
 import { DIR } from '../renderer/spriteDirections';
-import { checkTutorialBossDefeated } from '../tutorial/tutorialBossAI';
+import { checkTutorialBossDefeated, resetTutorialBossState } from '../tutorial/tutorialBossAI';
 
 /**
  * 开始战斗
@@ -20,6 +20,11 @@ export function startBattle(state) {
   state.player.facing = DIR.RIGHT;
   state.monster.facing = DIR.LEFT;
   state.battleLog.push(`战斗开始！遭遇了${state.monster.name}！`);
+
+  // 教程Boss：重置血量节点提示状态
+  if (state.monster?.isTutorial && state.monster.bossKey) {
+    resetTutorialBossState();
+  }
 }
 
 /**
@@ -36,9 +41,14 @@ export function executeBattleTurn(state, input) {
     state.battleLog.push(msg);
   }
 
+  // 回合遗物效果（如每回合掉血）
+  if (state.currentRelic?.onTurn) {
+    state.currentRelic.onTurn(state);
+  }
+
   // 检查玩家是否因状态效果死亡
   if (state.player.hp <= 0) {
-    grantBattleDefeat(state);
+    if (!grantBattleDefeat(state)) return; // 凤凰羽毛复活，不进入死亡
     return;
   }
 
@@ -55,6 +65,20 @@ export function executeBattleTurn(state, input) {
         state.monster.hp += heal;
         state.battleLog.push(`${state.monster.name}恢复了${heal} HP`);
       }
+    }
+
+    // 检查怪物是否因状态效果死亡
+    if (state.monster.hp <= 0) {
+      if (state.monster.isTutorial) {
+        if (state.monster.bossKey) {
+          checkTutorialBossDefeated(state);
+        } else {
+          grantBattleRewards(state);
+        }
+      } else {
+        grantBattleRewards(state);
+      }
+      return;
     }
   }
 
@@ -76,7 +100,7 @@ export function executeBattleTurn(state, input) {
     if (bleedMsg) {
       state.battleLog.push(bleedMsg);
       if (state.player.hp <= 0) {
-        grantBattleDefeat(state);
+        if (!grantBattleDefeat(state)) return; // 凤凰羽毛复活
         return;
       }
     }
@@ -101,6 +125,12 @@ export function executeBattleTurn(state, input) {
   // 教程Boss：每回合检查是否应该投降（HP降到1的情况）
   if (state.monster.isTutorial && state.monster.bossKey) {
     if (checkTutorialBossDefeated(state)) return;
+  }
+
+  // 教官已投降：锁定玩家操作，Boss 也不再攻击
+  if (state.monster?.surrendered) {
+    state.battleLog.push('教官已放下武器，训练结束。请点击「继续」回到营地。');
+    return;
   }
 
   // 3. 怪物/Boss行动（怪物冻结检查）
@@ -130,5 +160,6 @@ export function executeBattleTurn(state, input) {
       return;
     }
     grantBattleDefeat(state);
+    return;
   }
 }

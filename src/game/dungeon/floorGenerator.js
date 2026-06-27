@@ -1,4 +1,4 @@
-import { GRID_SIZE, OBSTACLE_COUNT, FLOORS, OBSTACLE_THEME, OBSTACLE_GEN_MAX_ATTEMPTS, FLOOR_MONSTER_COUNT } from '../constants';
+import { GAME_PHASE, GRID_SIZE, OBSTACLE_COUNT, FLOORS, OBSTACLE_THEME, OBSTACLE_GEN_MAX_ATTEMPTS, FLOOR_MONSTER_COUNT } from '../constants';
 import { generateMonster } from '../monsters';
 import { scaleMonsterForFloor } from './difficultyScaling';
 import { createBoss } from '../boss/bossFactory';
@@ -57,7 +57,7 @@ export function generateFloor(state, floor) {
   }
 
   state.battleLog = [];
-  state.gamePhase = 'exploration';
+  state.gamePhase = GAME_PHASE.EXPLORATION;
   resetVisitedTiles(state);
   updateVisitedTiles(state);
   state.battleLog.push(`进入${config.name}`);

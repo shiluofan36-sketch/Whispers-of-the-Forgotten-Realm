@@ -27,6 +27,11 @@ app.use('/api/v1', adminRoutes);
 
 app.use(errorHandler);
 
+// Catch unhandled promise rejections to prevent server crash
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('[WotFR Server] Unhandled Rejection:', reason);
+});
+
 async function start() {
   try {
     console.log('[WotFR Server] Initializing database...');

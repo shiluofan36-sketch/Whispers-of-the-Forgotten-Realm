@@ -1,5 +1,6 @@
 import { getRandomEquipment, getEquipmentInfo } from '../equipment/equipmentManager';
 import { addItem } from '../inventory/inventoryManager';
+import { addExp } from '../level';
 import { setWorldFlag } from '../world/worldFlags';
 
 // 自动结算事件（Phase 9 保留）
@@ -139,10 +140,8 @@ const CHOICE_EVENTS = [
     reward: '获得大量经验（当前楼层×30 EXP）',
     onAccept(state) {
       state.battleLog.push('[远古遗迹] 遗迹中涌出黑暗能量...准备战斗！');
-      // 触发额外战斗：简单处理为直接获得经验
-      const expGain = state.currentFloor * 30;
-      state.player.exp += expGain;
-      state.battleLog.push(`[远古遗迹] 你击败了守卫，获得 ${expGain} EXP！`);
+      // 触发额外战斗：获得经验
+      addExp(state, state.currentFloor * 30);
     },
     onDecline(state) {
       state.battleLog.push('[远古遗迹] 你决定不打扰古老的守卫。');

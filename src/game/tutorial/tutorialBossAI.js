@@ -4,6 +4,7 @@
  * - 在特定血量节点给出教学提示
  * - HP降到1时投降
  */
+import { GAME_PHASE } from '../constants';
 import { applyMonsterDamage } from '../battle/damageSystem';
 import { addFloatingText, entityCenter } from '../effects/floatingTextManager';
 import { triggerPlayerFlash } from '../effects/entityFlash';
@@ -60,15 +61,20 @@ function tutorialBossAttack(state) {
 
   const { damage, notes } = applyMonsterDamage(state, baseDmg);
 
-  // 安全检查：确保不杀死玩家
-  if (state.player.hp - damage <= 0) {
-    state.battleLog.push('教官的攻击被你勉强挡住！（教官手下留情了）');
-    triggerScreenShake(state, 2, 0.1);
-    return;
+  // applyMonsterDamage 已扣减 HP，教官不会杀死玩家：保底 HP=1
+  if (state.player.hp === 0) {
+    state.player.hp = 1;
   }
 
   if (notes.includes('闪避')) {
     state.battleLog.push(`教官的攻击被你闪避了！`);
+    triggerScreenShake(state, 2, 0.1);
+    return;
+  }
+
+  if (damage === 0) {
+    state.battleLog.push('教官的攻击被你勉强挡住！（教官手下留情了）');
+    triggerScreenShake(state, 2, 0.1);
     return;
   }
 
@@ -97,6 +103,7 @@ function tutorialBossHeal(state) {
 /**
  * 检查教程Boss是否应该投降
  * 在 battleEngine 中每次玩家行动后调用
+ * 投降后设置 surrendered=true，锁定玩家操作直到点击气泡继续
  */
 export function checkTutorialBossDefeated(state) {
   const boss = state.monster;
@@ -104,6 +111,7 @@ export function checkTutorialBossDefeated(state) {
 
   if (boss.hp <= 1) {
     boss.hp = 1;
+    boss.surrendered = true; // 锁定后续攻击，玩家不可再操作
     state.battleLog.push('教官：「很好！训练结束——你已经掌握了战斗的要领。」');
     state.pendingEvent = {
       name: '训练完成！',
@@ -117,7 +125,7 @@ export function checkTutorialBossDefeated(state) {
         s.monster = null;
         s.bossDefeated = true;
         s.enemiesRemaining = 0;
-        s.gamePhase = 'exploration';
+        s.gamePhase = GAME_PHASE.EXPLORATION;
         advanceTutorialStep(s);
       },
       onDecline: (s) => { s.pendingEvent = null; },

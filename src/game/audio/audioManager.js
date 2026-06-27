@@ -79,6 +79,19 @@ function synthImpact(ctx, vol) {
   synthNoise(ctx, 0.08, vol * 0.5);
 }
 
+// Track active timers per sfx call to prevent accumulation
+let timerCounter = 0;
+
+function playDelayedTone(ctx, freq, duration, vol, type, delayMs) {
+  const id = timerCounter++;
+  const timer = setTimeout(() => {
+    synthTone(ctx, freq, duration, vol, type);
+    // Clean up after the tone finishes + delay
+  }, delayMs);
+  // Store timer ID so it can be cleared if needed
+  return timer;
+}
+
 // ---- 公开 API（与旧接口一致）----
 
 const SFX_MAP = {
@@ -87,10 +100,14 @@ const SFX_MAP = {
   block(ctx)        { synthImpact(ctx, 0.3); },
   death(ctx)        { synthTone(ctx, 400, 0.4, 0.3, 'sawtooth', 80); synthNoise(ctx, 0.3, 0.15); },
   click(ctx)        { synthTone(ctx, 800, 0.03, 0.15, 'sine', 600); },
-  loot(ctx)         { synthTone(ctx, 523, 0.1, 0.2, 'sine'); setTimeout(() => synthTone(ctx, 659, 0.1, 0.2, 'sine'), 60); setTimeout(() => synthTone(ctx, 784, 0.15, 0.2, 'sine'), 120); },
+  loot(ctx)         {
+    synthTone(ctx, 523, 0.1, 0.2, 'sine');
+    playDelayedTone(ctx, 659, 0.1, 0.2, 'sine', 60);
+    playDelayedTone(ctx, 784, 0.15, 0.2, 'sine', 120);
+  },
   achievement(ctx)  {
     [523, 659, 784, 1047].forEach((f, i) => {
-      setTimeout(() => synthTone(ctx, f, 0.2, 0.2, 'sine'), i * 100);
+      playDelayedTone(ctx, f, 0.2, 0.2, 'sine', i * 100);
     });
   },
   boss_enrage(ctx)  { synthTone(ctx, 60, 0.5, 0.4, 'sawtooth', 30); synthNoise(ctx, 0.4, 0.25); },

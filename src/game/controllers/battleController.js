@@ -6,7 +6,15 @@ import { getItem } from '../inventory/inventoryManager';
 import { isActionAllowed } from '../tutorial/tutorialManager';
 
 export function handleBattleAction(state, action) {
-  // 教程步骤3：只允许基本攻击/防御/治疗
+  // 教程步骤 2：打训练假人，只允许基础攻击/防御/治疗
+  if (state.tutorialStep === 2) {
+    if (action !== 'attack' && action !== 'defend' && action !== 'heal') {
+      state.battleLog.push('教官：「先用基础指令和假人过招吧。」');
+      return;
+    }
+  }
+
+  // 教程步骤 3：只允许基本攻击/防御/治疗
   if (state.tutorialStep === 3) {
     if (action === 'attack' && !isActionAllowed(state, 'battle_attack')) {
       state.battleLog.push('教官：「这一阶段只练习基本攻击、防御和治疗。」');
@@ -26,7 +34,13 @@ export function handleBattleAction(state, action) {
 }
 
 export function handleSkill(state, skillKey) {
-  // 教程步骤3：禁止技能
+  // 教程步骤 2：禁止技能（打假人阶段）
+  if (state.tutorialStep === 2) {
+    state.battleLog.push('教官：「先用基础指令和假人过招吧。」');
+    return false;
+  }
+
+  // 教程步骤 3：禁止技能
   if (state.tutorialStep === 3) {
     state.battleLog.push('教官：「先学好基础，技能之后再用。」');
     return false;
@@ -48,7 +62,13 @@ export function handleSkill(state, skillKey) {
 }
 
 export function handleUseItem(state, slot) {
-  // 教程步骤3：禁止使用道具（先学基础）
+  // 教程步骤 2：禁止使用道具（打假人阶段）
+  if (state.tutorialStep === 2) {
+    state.battleLog.push('教官：「先用基础指令和假人过招吧。」');
+    return false;
+  }
+
+  // 教程步骤 3：禁止使用道具（先学基础）
   if (state.tutorialStep === 3) {
     state.battleLog.push('教官：「先练好基本功再考虑道具。」');
     return false;

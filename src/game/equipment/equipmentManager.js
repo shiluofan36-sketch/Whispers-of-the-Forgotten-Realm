@@ -1,4 +1,5 @@
 import { EQUIPMENT_TYPES } from '../constants';
+import { tryAddItem } from '../inventory/stackSystem';
 
 const STAT_KEYS = [
   'attackMin', 'attackMax', 'strength', 'defense', 'agility',
@@ -38,6 +39,10 @@ export function equipItem(state, itemKey, generatedData) {
   const rarity = generatedData ? generatedData.rarity : eq.rarity;
   const buildTags = generatedData ? generatedData.buildTags : [];
 
+  if (!bonuses) {
+    return { success: false, message: `装备数据异常：缺少属性加成 ${itemKey}` };
+  }
+
   applyStatBonuses(player, bonuses, 1);
   player.equipment[slot] = {
     itemKey, name: displayName, slot, rarity: rarity || 'common',
@@ -58,11 +63,19 @@ export function unequipItem(state, slot) {
   const bonuses = equipped.generated ? equipped.generated.bonus : eq.bonus;
   applyStatBonuses(state.player, bonuses, -1);
 
-  // Put back into inventory with generated data
+  // Put back into inventory (respect capacity)
   if (equipped.generated) {
-    state.inventory.push({ itemKey: equipped.itemKey, quantity: 1, generated: equipped.generated });
+    const added = tryAddItem(state.inventory, state.inventorySlots, equipped.itemKey, 1, equipped.generated);
+    if (!added) {
+      state.battleLog.push('背包已满，卸下失败！');
+      return { success: false, message: '背包已满，卸下失败！' };
+    }
   } else {
-    state.inventory.push({ itemKey: equipped.itemKey, quantity: 1 });
+    const added = tryAddItem(state.inventory, state.inventorySlots, equipped.itemKey, 1, null);
+    if (!added) {
+      state.battleLog.push('背包已满，卸下失败！');
+      return { success: false, message: '背包已满，卸下失败！' };
+    }
   }
 
   state.player.equipment[slot] = null;

@@ -14,6 +14,10 @@ export function grantGoldReward(state, monster) {
   if (monster.isElite) {
     gold = Math.floor(gold * ELITE_GOLD_MULT);
   }
+  // Phase 15: 遗物金币加成
+  if (state.currentRelic?.goldMult) {
+    gold = Math.floor(gold * state.currentRelic.goldMult);
+  }
   if (gold > 0) {
     state.expeditionGold += gold;
     state.battleLog.push(`获得了 ${gold} Gold！`);
